@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="RTFSC (Read the fucking source code )," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire 2.0" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="OverView继承关系  onMeasure调用流程时序图 背景知识关于源码onMeasure12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808">
+<meta name="keywords" content="RTFSC (Read the fucking source code )">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TextView 源码解读篇">
+<meta property="og:url" content="http://jinjian.info/2017/08/06/TextView 源码解读篇/index.html">
+<meta property="og:site_name" content="Desire 2.0">
+<meta property="og:description" content="OverView继承关系  onMeasure调用流程时序图 背景知识关于源码onMeasure12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://jinjian.info/images/TextView_OverView.png">
+<meta property="og:image" content="http://jinjian.info/Users/jinsan/Documents/SequenceDiagram1.png">
+<meta property="og:image" content="http://jinjian.info/images/TextView_Path.png">
+<meta property="og:image" content="http://jinjian.info/images/TextView_Emoji.png">
+<meta property="og:image" content="http://jinjian.info/Users/jinsan/Downloads/onDraw时序图.png">
+<meta property="og:image" content="http://jinjian.info/images/TextView_Method.png">
+<meta property="og:updated_time" content="2017-12-23T19:33:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TextView 源码解读篇">
+<meta name="twitter:description" content="OverView继承关系  onMeasure调用流程时序图 背景知识关于源码onMeasure12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808">
+<meta name="twitter:image" content="http://jinjian.info/images/TextView_OverView.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2017/08/06/TextView 源码解读篇/"/>
+
+
+
+
+
+  <title>TextView 源码解读篇 | Desire 2.0</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire 2.0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2017/08/06/TextView 源码解读篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire 2.0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TextView 源码解读篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-06T00:00:00+08:00">
+                2017-08-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读别人的源码，涨自己的智慧/" itemprop="url" rel="index">
+                    <span itemprop="name">读别人的源码，涨自己的智慧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  5,025字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  30分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="OverView"><a href="#OverView" class="headerlink" title="OverView"></a>OverView</h2><p>继承关系</p>
+<p><img src="/images/TextView_OverView.png" alt="TextView_OverView"></p>
+<h2 id="onMeasure"><a href="#onMeasure" class="headerlink" title="onMeasure"></a>onMeasure</h2><h3 id="调用流程"><a href="#调用流程" class="headerlink" title="调用流程"></a>调用流程</h3><h4 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h4><p><img src="/Users/jinsan/Documents/SequenceDiagram1.png" alt="SequenceDiagram1"></p>
+<h3 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h3><h3 id="关于源码"><a href="#关于源码" class="headerlink" title="关于源码"></a>关于源码</h3><h4 id="onMeasure-1"><a href="#onMeasure-1" class="headerlink" title="onMeasure"></a>onMeasure</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br></pre></td><td class="code"><pre><span class="line">  <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line"><span class="comment">//get the width and height from parent(decide by parent's layoutParam and view's layoutParam )</span></span><br><span class="line">        <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</span><br><span class="line">        <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);</span><br><span class="line">        <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</span><br><span class="line">        <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> width;</span><br><span class="line">        <span class="keyword">int</span> height;</span><br><span class="line"></span><br><span class="line">        BoringLayout.Metrics boring = UNKNOWN_BORING;</span><br><span class="line">        BoringLayout.Metrics hintBoring = UNKNOWN_BORING;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//get TextDirectionHeuristic(default:LTR)</span></span><br><span class="line">        <span class="keyword">if</span> (mTextDir == <span class="keyword">null</span>) &#123;</span><br><span class="line">            mTextDir = getTextDirectionHeuristic();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> des = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">boolean</span> fromexisting = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (widthMode == MeasureSpec.EXACTLY) &#123;</span><br><span class="line">            <span class="comment">// Parent has told us how big to be. So be it.</span></span><br><span class="line">            width = widthSize;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (mLayout != <span class="keyword">null</span> &amp;&amp; mEllipsize == <span class="keyword">null</span>) &#123;</span><br><span class="line">              <span class="comment">//desired(if all of lineEnd is not '\n' , marks it as singleLine and return -1;or renture the max of line witdh)</span></span><br><span class="line">                des = desired(mLayout);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//singleLine</span></span><br><span class="line">            <span class="keyword">if</span> (des &lt; <span class="number">0</span>) &#123;</span><br><span class="line">              <span class="comment">//input texts paint direction fontmetrics,if it is singLine return the width of given tex and metrics</span></span><br><span class="line">                boring = BoringLayout.isBoring(mTransformed, mTextPaint, mTextDir, mBoring);</span><br><span class="line">                <span class="keyword">if</span> (boring != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    mBoring = boring;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                fromexisting = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (boring == <span class="keyword">null</span> || boring == UNKNOWN_BORING) &#123;</span><br><span class="line">              <span class="comment">//not SingleLine</span></span><br><span class="line">                <span class="keyword">if</span> (des &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                  <span class="comment">//find the max width of lines,just from the source of  texts</span></span><br><span class="line">                    des = (<span class="keyword">int</span>) Math.ceil(Layout.getDesiredWidth(mTransformed, mTextPaint));</span><br><span class="line">                &#125;</span><br><span class="line">                width = des;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                width = boring.width;</span><br><span class="line">            &#125;</span><br><span class="line"><span class="comment">//-------from text---------above has the width wether from boringLayout or from getDesiredWidth----</span></span><br><span class="line">            <span class="comment">//compare with the drawable width</span></span><br><span class="line">            <span class="keyword">final</span> Drawables dr = mDrawables;</span><br><span class="line">            <span class="keyword">if</span> (dr != <span class="keyword">null</span>) &#123;</span><br><span class="line">              <span class="comment">//if drawableTop or drawableBottom is wider than texts</span></span><br><span class="line">                width = Math.max(width, dr.mDrawableWidthTop);</span><br><span class="line">                width = Math.max(width, dr.mDrawableWidthBottom);</span><br><span class="line">            &#125;</span><br><span class="line"><span class="comment">//--------from drawable ---------above compare width with drawable ---------------</span></span><br><span class="line">            <span class="comment">//hint width</span></span><br><span class="line">            <span class="keyword">if</span> (mHint != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> hintDes = -<span class="number">1</span>;</span><br><span class="line">                <span class="keyword">int</span> hintWidth;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (mHintLayout != <span class="keyword">null</span> &amp;&amp; mEllipsize == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    hintDes = desired(mHintLayout);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (hintDes &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                    hintBoring = BoringLayout.isBoring(mHint, mTextPaint, mTextDir, mHintBoring);</span><br><span class="line">                    <span class="keyword">if</span> (hintBoring != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        mHintBoring = hintBoring;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (hintBoring == <span class="keyword">null</span> || hintBoring == UNKNOWN_BORING) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (hintDes &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                        hintDes = (<span class="keyword">int</span>) Math.ceil(Layout.getDesiredWidth(mHint, mTextPaint));</span><br><span class="line">                    &#125;</span><br><span class="line">                    hintWidth = hintDes;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    hintWidth = hintBoring.width;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (hintWidth &gt; width) &#123;</span><br><span class="line">                    width = hintWidth;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"><span class="comment">//-------from hinttext-------------------above compare width with hinttext same process as text---</span></span><br><span class="line">            width += getCompoundPaddingLeft() + getCompoundPaddingRight();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//ems limit</span></span><br><span class="line">            <span class="keyword">if</span> (mMaxWidthMode == EMS) &#123;</span><br><span class="line">                <span class="comment">//I don't know why to compare the width with getLineHeight()</span></span><br><span class="line">                width = Math.min(width, mMaxWidth * getLineHeight());</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                width = Math.min(width, mMaxWidth);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (mMinWidthMode == EMS) &#123;</span><br><span class="line">                width = Math.max(width, mMinWidth * getLineHeight());</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                width = Math.max(width, mMinWidth);</span><br><span class="line">            &#125;</span><br><span class="line"><span class="comment">//----------from ems----------------above compare width with ems value -----------------</span></span><br><span class="line">            <span class="comment">// Check against our minimum width</span></span><br><span class="line">            width = Math.max(width, getSuggestedMinimumWidth());</span><br><span class="line"><span class="comment">//------------from backgourd ---------above compare width with background width----</span></span><br><span class="line">            <span class="keyword">if</span> (widthMode == MeasureSpec.AT_MOST) &#123;</span><br><span class="line">                width = Math.min(widthSize, width);</span><br><span class="line">            &#125;</span><br><span class="line"> <span class="comment">// -----from parent width -------------above compare width with parent width </span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> want = width - getCompoundPaddingLeft() - getCompoundPaddingRight();</span><br><span class="line">        <span class="keyword">int</span> unpaddedWidth = want;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mHorizontallyScrolling) want = VERY_WIDE;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> hintWant = want;</span><br><span class="line">        <span class="keyword">int</span> hintWidth = (mHintLayout == <span class="keyword">null</span>) ? hintWant : mHintLayout.getWidth();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mLayout == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="comment">// :here to find the right layout eg:staticLayout ,dynamicLayout or boringLayout</span></span><br><span class="line">          <span class="comment">// process:makeNewLayout-&gt;makeSingleLayout</span></span><br><span class="line">            makeNewLayout(want, hintWant, boring, hintBoring,</span><br><span class="line">                          width - getCompoundPaddingLeft() - getCompoundPaddingRight(), <span class="keyword">false</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">boolean</span> layoutChanged = (mLayout.getWidth() != want) ||</span><br><span class="line">                    (hintWidth != hintWant) ||</span><br><span class="line">                    (mLayout.getEllipsizedWidth() !=</span><br><span class="line">                            width - getCompoundPaddingLeft() - getCompoundPaddingRight());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">boolean</span> widthChanged = (mHint == <span class="keyword">null</span>) &amp;&amp;</span><br><span class="line">                    (mEllipsize == <span class="keyword">null</span>) &amp;&amp;</span><br><span class="line">                    (want &gt; mLayout.getWidth()) &amp;&amp;</span><br><span class="line">                    (mLayout <span class="keyword">instanceof</span> BoringLayout || (fromexisting &amp;&amp; des &gt;= <span class="number">0</span> &amp;&amp; des &lt;= want));</span><br><span class="line"></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">boolean</span> maximumChanged = (mMaxMode != mOldMaxMode) || (mMaximum != mOldMaximum);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (layoutChanged || maximumChanged) &#123;</span><br><span class="line">              <span class="comment">//if layoutChanged or maxumunChanged</span></span><br><span class="line">                <span class="keyword">if</span> (!maximumChanged &amp;&amp; widthChanged) &#123;</span><br><span class="line">                  <span class="comment">//if only widthChanged just incerease</span></span><br><span class="line">                    mLayout.increaseWidthTo(want);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  <span class="comment">//recongnize it as new one </span></span><br><span class="line">                    makeNewLayout(want, hintWant, boring, hintBoring,</span><br><span class="line">                            width - getCompoundPaddingLeft() - getCompoundPaddingRight(), <span class="keyword">false</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// Nothing has changed</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//---------------------------------------------------height start ------------------</span></span><br><span class="line">        <span class="keyword">if</span> (heightMode == MeasureSpec.EXACTLY) &#123;</span><br><span class="line">            <span class="comment">// Parent has told us how big to be. So be it.</span></span><br><span class="line">            height = heightSize;</span><br><span class="line">            mDesiredHeightAtMeasure = -<span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//condition:hintHeight,textHeight,MaxLine,MinLine.drawableLeft and drawableRight;</span></span><br><span class="line">          <span class="comment">//the desired height contains the padHeight </span></span><br><span class="line">            <span class="keyword">int</span> desired = getDesiredHeight();</span><br><span class="line"></span><br><span class="line">            height = desired;</span><br><span class="line">            mDesiredHeightAtMeasure = desired;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (heightMode == MeasureSpec.AT_MOST) &#123;</span><br><span class="line">                height = Math.min(desired, heightSize);</span><br><span class="line">            &#125;</span><br><span class="line">          <span class="comment">//---from parent height ------compare  height with parent height------------</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//unpaddedHeight wheter the totalHeight -padding or maxLineHeight(in MaxMode == Lines) </span></span><br><span class="line">        <span class="keyword">int</span> unpaddedHeight = height - getCompoundPaddingTop() - getCompoundPaddingBottom();</span><br><span class="line">        <span class="keyword">if</span> (mMaxMode == LINES &amp;&amp; mLayout.getLineCount() &gt; mMaximum) &#123;</span><br><span class="line">            unpaddedHeight = Math.min(unpaddedHeight, mLayout.getLineTop(mMaximum));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * We didn't let makeNewLayout() register to bring the cursor into view,</span></span><br><span class="line"><span class="comment">         * so do it here if there is any possibility that it is needed.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">      <span class="comment">//by setMovementMethod textView could scroll,if space is not enough </span></span><br><span class="line">        <span class="keyword">if</span> (mMovement != <span class="keyword">null</span> ||</span><br><span class="line">            mLayout.getWidth() &gt; unpaddedWidth ||</span><br><span class="line">            mLayout.getHeight() &gt; unpaddedHeight) &#123;</span><br><span class="line">            registerForPreDraw();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            scrollTo(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//set the final values </span></span><br><span class="line">        setMeasuredDimension(width, height);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="makeNewLayout"><a href="#makeNewLayout" class="headerlink" title="makeNewLayout"></a>makeNewLayout</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The width passed in is now the desired layout width,</span></span><br><span class="line"><span class="comment"> * not the full view width with padding.</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@hide</span>&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">makeNewLayout</span><span class="params">(<span class="keyword">int</span> wantWidth, <span class="keyword">int</span> hintWidth,</span></span></span><br><span class="line"><span class="function"><span class="params">                             BoringLayout.Metrics boring,</span></span></span><br><span class="line"><span class="function"><span class="params">                             BoringLayout.Metrics hintBoring,</span></span></span><br><span class="line"><span class="function"><span class="params">                             <span class="keyword">int</span> ellipsisWidth, <span class="keyword">boolean</span> bringIntoView)</span> </span>&#123;</span><br><span class="line">    stopMarquee();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update "old" cached values</span></span><br><span class="line">    mOldMaximum = mMaximum;</span><br><span class="line">    mOldMaxMode = mMaxMode;</span><br><span class="line"></span><br><span class="line">    mHighlightPathBogus = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (wantWidth &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        wantWidth = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (hintWidth &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        hintWidth = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Layout.Alignment alignment = getLayoutAlignment();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> testDirChange = mSingleLine &amp;&amp; mLayout != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">        (alignment == Layout.Alignment.ALIGN_NORMAL ||</span><br><span class="line">         alignment == Layout.Alignment.ALIGN_OPPOSITE);</span><br><span class="line">    <span class="keyword">int</span> oldDir = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (testDirChange) oldDir = mLayout.getParagraphDirection(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">boolean</span> shouldEllipsize = mEllipsize != <span class="keyword">null</span> &amp;&amp; getKeyListener() == <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> switchEllipsize = mEllipsize == TruncateAt.MARQUEE &amp;&amp;</span><br><span class="line">            mMarqueeFadeMode != MARQUEE_FADE_NORMAL;</span><br><span class="line">    TruncateAt effectiveEllipsize = mEllipsize;</span><br><span class="line">    <span class="keyword">if</span> (mEllipsize == TruncateAt.MARQUEE &amp;&amp;</span><br><span class="line">            mMarqueeFadeMode == MARQUEE_FADE_SWITCH_SHOW_ELLIPSIS) &#123;</span><br><span class="line">        effectiveEllipsize = TruncateAt.END_SMALL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mTextDir == <span class="keyword">null</span>) &#123;</span><br><span class="line">        mTextDir = getTextDirectionHeuristic();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mLayout = makeSingleLayout(wantWidth, boring, ellipsisWidth, alignment, shouldEllipsize,</span><br><span class="line">            effectiveEllipsize, effectiveEllipsize == mEllipsize);</span><br><span class="line">    <span class="keyword">if</span> (switchEllipsize) &#123;</span><br><span class="line">        TruncateAt oppositeEllipsize = effectiveEllipsize == TruncateAt.MARQUEE ?</span><br><span class="line">                TruncateAt.END : TruncateAt.MARQUEE;</span><br><span class="line">        mSavedMarqueeModeLayout = makeSingleLayout(wantWidth, boring, ellipsisWidth, alignment,</span><br><span class="line">                shouldEllipsize, oppositeEllipsize, effectiveEllipsize != mEllipsize);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    shouldEllipsize = mEllipsize != <span class="keyword">null</span>;</span><br><span class="line">    mHintLayout = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mHint != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (shouldEllipsize) hintWidth = wantWidth;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (hintBoring == UNKNOWN_BORING) &#123;</span><br><span class="line">            hintBoring = BoringLayout.isBoring(mHint, mTextPaint, mTextDir,</span><br><span class="line">                                               mHintBoring);</span><br><span class="line">            <span class="keyword">if</span> (hintBoring != <span class="keyword">null</span>) &#123;</span><br><span class="line">                mHintBoring = hintBoring;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (hintBoring != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (hintBoring.width &lt;= hintWidth &amp;&amp;</span><br><span class="line">                (!shouldEllipsize || hintBoring.width &lt;= ellipsisWidth)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (mSavedHintLayout != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    mHintLayout = mSavedHintLayout.</span><br><span class="line">                            replaceOrMake(mHint, mTextPaint,</span><br><span class="line">                            hintWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                            hintBoring, mIncludePad);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    mHintLayout = BoringLayout.make(mHint, mTextPaint,</span><br><span class="line">                            hintWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                            hintBoring, mIncludePad);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                mSavedHintLayout = (BoringLayout) mHintLayout;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (shouldEllipsize &amp;&amp; hintBoring.width &lt;= hintWidth) &#123;</span><br><span class="line">                <span class="keyword">if</span> (mSavedHintLayout != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    mHintLayout = mSavedHintLayout.</span><br><span class="line">                            replaceOrMake(mHint, mTextPaint,</span><br><span class="line">                            hintWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                            hintBoring, mIncludePad, mEllipsize,</span><br><span class="line">                            ellipsisWidth);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    mHintLayout = BoringLayout.make(mHint, mTextPaint,</span><br><span class="line">                            hintWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                            hintBoring, mIncludePad, mEllipsize,</span><br><span class="line">                            ellipsisWidth);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> code duplication with makeSingleLayout()</span></span><br><span class="line">        <span class="keyword">if</span> (mHintLayout == <span class="keyword">null</span>) &#123;</span><br><span class="line">            StaticLayout.Builder builder = StaticLayout.Builder.obtain(mHint, <span class="number">0</span>,</span><br><span class="line">                    mHint.length(), mTextPaint, hintWidth)</span><br><span class="line">                    .setAlignment(alignment)</span><br><span class="line">                    .setTextDirection(mTextDir)</span><br><span class="line">                    .setLineSpacing(mSpacingAdd, mSpacingMult)</span><br><span class="line">                    .setIncludePad(mIncludePad)</span><br><span class="line">                    .setBreakStrategy(mBreakStrategy)</span><br><span class="line">                    .setHyphenationFrequency(mHyphenationFrequency);</span><br><span class="line">            <span class="keyword">if</span> (shouldEllipsize) &#123;</span><br><span class="line">                builder.setEllipsize(mEllipsize)</span><br><span class="line">                        .setEllipsizedWidth(ellipsisWidth)</span><br><span class="line">                        .setMaxLines(mMaxMode == LINES ? mMaximum : Integer.MAX_VALUE);</span><br><span class="line">            &#125;</span><br><span class="line">            mHintLayout = builder.build();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bringIntoView || (testDirChange &amp;&amp; oldDir != mLayout.getParagraphDirection(<span class="number">0</span>))) &#123;</span><br><span class="line">        registerForPreDraw();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mEllipsize == TextUtils.TruncateAt.MARQUEE) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!compressText(ellipsisWidth)) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> height = mLayoutParams.height;</span><br><span class="line">            <span class="comment">// If the size of the view does not depend on the size of the text, try to</span></span><br><span class="line">            <span class="comment">// start the marquee immediately</span></span><br><span class="line">            <span class="keyword">if</span> (height != LayoutParams.WRAP_CONTENT &amp;&amp; height != LayoutParams.MATCH_PARENT) &#123;</span><br><span class="line">                startMarquee();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// Defer the start of the marquee until we know our width (see setFrame())</span></span><br><span class="line">                mRestartMarquee = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// CursorControllers need a non-null mLayout</span></span><br><span class="line">    <span class="keyword">if</span> (mEditor != <span class="keyword">null</span>) mEditor.prepareCursorControllers();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="makeSingleLayout"><a href="#makeSingleLayout" class="headerlink" title="makeSingleLayout"></a>makeSingleLayout</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Layout <span class="title">makeSingleLayout</span><span class="params">(<span class="keyword">int</span> wantWidth, BoringLayout.Metrics boring, <span class="keyword">int</span> ellipsisWidth,</span></span></span><br><span class="line"><span class="function"><span class="params">          Layout.Alignment alignment, <span class="keyword">boolean</span> shouldEllipsize, TruncateAt effectiveEllipsize,</span></span></span><br><span class="line"><span class="function"><span class="params">          <span class="keyword">boolean</span> useSaved)</span> </span>&#123;</span><br><span class="line">      Layout result = <span class="keyword">null</span>;</span><br><span class="line">      <span class="keyword">if</span> (mText <span class="keyword">instanceof</span> Spannable) &#123;</span><br><span class="line">          result = <span class="keyword">new</span> DynamicLayout(mText, mTransformed, mTextPaint, wantWidth,</span><br><span class="line">                  alignment, mTextDir, mSpacingMult, mSpacingAdd, mIncludePad,</span><br><span class="line">                  mBreakStrategy, mHyphenationFrequency,</span><br><span class="line">                  getKeyListener() == <span class="keyword">null</span> ? effectiveEllipsize : <span class="keyword">null</span>, ellipsisWidth);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="keyword">if</span> (boring == UNKNOWN_BORING) &#123;</span><br><span class="line">              boring = BoringLayout.isBoring(mTransformed, mTextPaint, mTextDir, mBoring);</span><br><span class="line">              <span class="keyword">if</span> (boring != <span class="keyword">null</span>) &#123;</span><br><span class="line">                  mBoring = boring;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (boring != <span class="keyword">null</span>) &#123;</span><br><span class="line">              <span class="keyword">if</span> (boring.width &lt;= wantWidth &amp;&amp;</span><br><span class="line">                      (effectiveEllipsize == <span class="keyword">null</span> || boring.width &lt;= ellipsisWidth)) &#123;</span><br><span class="line">                  <span class="keyword">if</span> (useSaved &amp;&amp; mSavedLayout != <span class="keyword">null</span>) &#123;</span><br><span class="line">                      result = mSavedLayout.replaceOrMake(mTransformed, mTextPaint,</span><br><span class="line">                              wantWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                              boring, mIncludePad);</span><br><span class="line">                  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                      result = BoringLayout.make(mTransformed, mTextPaint,</span><br><span class="line">                              wantWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                              boring, mIncludePad);</span><br><span class="line">                  &#125;</span><br><span class="line"></span><br><span class="line">                  <span class="keyword">if</span> (useSaved) &#123;</span><br><span class="line">                      mSavedLayout = (BoringLayout) result;</span><br><span class="line">                  &#125;</span><br><span class="line">              &#125; <span class="keyword">else</span> <span class="keyword">if</span> (shouldEllipsize &amp;&amp; boring.width &lt;= wantWidth) &#123;</span><br><span class="line">                  <span class="keyword">if</span> (useSaved &amp;&amp; mSavedLayout != <span class="keyword">null</span>) &#123;</span><br><span class="line">                      result = mSavedLayout.replaceOrMake(mTransformed, mTextPaint,</span><br><span class="line">                              wantWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                              boring, mIncludePad, effectiveEllipsize,</span><br><span class="line">                              ellipsisWidth);</span><br><span class="line">                  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                      result = BoringLayout.make(mTransformed, mTextPaint,</span><br><span class="line">                              wantWidth, alignment, mSpacingMult, mSpacingAdd,</span><br><span class="line">                              boring, mIncludePad, effectiveEllipsize,</span><br><span class="line">                              ellipsisWidth);</span><br><span class="line">                  &#125;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">          StaticLayout.Builder builder = StaticLayout.Builder.obtain(mTransformed,</span><br><span class="line">                  <span class="number">0</span>, mTransformed.length(), mTextPaint, wantWidth)</span><br><span class="line">                  .setAlignment(alignment)</span><br><span class="line">                  .setTextDirection(mTextDir)</span><br><span class="line">                  .setLineSpacing(mSpacingAdd, mSpacingMult)</span><br><span class="line">                  .setIncludePad(mIncludePad)</span><br><span class="line">                  .setBreakStrategy(mBreakStrategy)</span><br><span class="line">                  .setHyphenationFrequency(mHyphenationFrequency);</span><br><span class="line">          <span class="keyword">if</span> (shouldEllipsize) &#123;</span><br><span class="line">              builder.setEllipsize(effectiveEllipsize)</span><br><span class="line">                      .setEllipsizedWidth(ellipsisWidth)</span><br><span class="line">                      .setMaxLines(mMaxMode == LINES ? mMaximum : Integer.MAX_VALUE);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="comment">// <span class="doctag">TODO:</span> explore always setting maxLines</span></span><br><span class="line">          result = builder.build();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> result;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="关键路径"><a href="#关键路径" class="headerlink" title="关键路径"></a>关键路径</h4><p><img src="/images/TextView_Path.png" alt="TextView_Path"></p>
+<h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><h4 id="行间距和字间距实现"><a href="#行间距和字间距实现" class="headerlink" title="行间距和字间距实现"></a>行间距和字间距实现</h4><ul>
+<li><p>com.android.internal.R.styleable.TextView_lineSpacingMultiplier:</p>
+<p>com.android.internal.R.styleable.TextView_lineSpacingExtra:</p>
+</li>
+<li><p>com.android.internal.R.styleable.TextView_letterSpacing:  api_level 21 5.0</p>
+<p>TextPaint开放接口提供功能实现</p>
+</li>
+</ul>
+<h4 id="如何判断换行"><a href="#如何判断换行" class="headerlink" title="如何判断换行"></a>如何判断换行</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">                 </span><br><span class="line"><span class="function"><span class="keyword">static</span> jint <span class="title">nComputeLineBreaks</span><span class="params">(JNIEnv* env, jclass, jlong nativePtr,</span></span></span><br><span class="line"><span class="function"><span class="params">                               jobject recycle, jintArray recycleBreaks,</span></span></span><br><span class="line"><span class="function"><span class="params">                               jfloatArray recycleWidths, jintArray recycleFlags,</span></span></span><br><span class="line"><span class="function"><span class="params">                               jint recycleLength)</span> </span>&#123;</span><br><span class="line">    LineBreaker* b = <span class="keyword">reinterpret_cast</span>&lt;LineBreaker*&gt;(nativePtr);</span><br><span class="line">    <span class="keyword">size_t</span> nBreaks = b-&gt;computeBreaks();</span><br><span class="line">    recycleCopy(env, recycle, recycleBreaks, recycleWidths, recycleFlags, recycleLength,</span><br><span class="line">            nBreaks, b-&gt;getBreaks(), b-&gt;getWidths(), b-&gt;getFlags());</span><br><span class="line">    b-&gt;finish();</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;jint&gt;(nBreaks);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="如何实现文字省略"><a href="#如何实现文字省略" class="headerlink" title="如何实现文字省略"></a>如何实现文字省略</h4><p>setBreakStrategy api_level 23 android 6.0</p>
+<p>values below:  <a href="https://developer.android.com/reference/android/text/Layout.html#BREAK_STRATEGY_SIMPLE" target="_blank" rel="noopener">https://developer.android.com/reference/android/text/Layout.html#BREAK_STRATEGY_SIMPLE</a></p>
+<h4 id="如何实现emoji的统一替换"><a href="#如何实现emoji的统一替换" class="headerlink" title="如何实现emoji的统一替换"></a>如何实现emoji的统一替换</h4><p>在settext之前把text替换成spannabelstring，并且插入imageSpan</p>
+<ul>
+<li>[ ] <a href="//TODO 20170708">imageSpan的继承关系和实现形式</a></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setText</span><span class="params">(CharSequence text, BufferType type)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span>((<span class="keyword">this</span>.supportEmoji || <span class="keyword">this</span>.supportEmotion) &amp;&amp; text != <span class="keyword">null</span>) &#123;</span><br><span class="line">           SpannableStringBuilder builder;</span><br><span class="line">           <span class="keyword">if</span>(<span class="keyword">this</span>.supportEmoji) &#123;</span><br><span class="line">               <span class="keyword">if</span>(!(text <span class="keyword">instanceof</span> SpannableStringBuilder) &amp;&amp; !(text <span class="keyword">instanceof</span> SpannableString)) &#123;</span><br><span class="line">                   text = EmojiUtil.ubb2utf(((CharSequence)text).toString());</span><br><span class="line">               &#125;</span><br><span class="line"></span><br><span class="line">               builder = <span class="keyword">new</span> SpannableStringBuilder((CharSequence)text);</span><br><span class="line">               <span class="keyword">this</span>.replaceCount = APEmojiRender.renderEmojiReturncount(<span class="keyword">this</span>.getContext(), builder, <span class="keyword">this</span>.getEmojiSize());</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               builder = <span class="keyword">new</span> SpannableStringBuilder((CharSequence)text);</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span>(<span class="keyword">this</span>.supportEmotion &amp;&amp; parseEmotionListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">this</span>.hasEmotion = parseEmotionListener.parser(<span class="keyword">this</span>.getContext(), builder, (CharSequence)text, <span class="keyword">this</span>.getEmojiSize());</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span>((<span class="keyword">this</span>.replaceCount &gt; <span class="number">0</span> || <span class="keyword">this</span>.hasEmotion) &amp;&amp; <span class="keyword">this</span>.getEllipsize() != <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">int</span> singleLine = <span class="keyword">this</span>.isSingleLine();</span><br><span class="line">               <span class="keyword">if</span>(singleLine == <span class="number">1</span>) &#123;</span><br><span class="line">                   <span class="keyword">this</span>.singeLineRender(builder, type);</span><br><span class="line">               &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                   <span class="keyword">super</span>.setText(builder, type);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">super</span>.setText(builder, type);</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span>(<span class="keyword">this</span>.onTextChangeListener != <span class="keyword">null</span> &amp;&amp; text != <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">this</span>.onTextChangeListener.onTextViewTextChange(<span class="keyword">this</span>, builder.toString());</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">super</span>.setText((CharSequence)text, type);</span><br><span class="line">           <span class="keyword">if</span>(<span class="keyword">this</span>.onTextChangeListener != <span class="keyword">null</span> &amp;&amp; text != <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">this</span>.onTextChangeListener.onTextViewTextChange(<span class="keyword">this</span>, ((CharSequence)text).toString());</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/TextView_Emoji.png" alt="TextView_Emoji"></p>
+<h2 id="onLayout"><a href="#onLayout" class="headerlink" title="onLayout"></a>onLayout</h2><h3 id="调用流程-1"><a href="#调用流程-1" class="headerlink" title="调用流程"></a>调用流程</h3><h3 id="背景知识-1"><a href="#背景知识-1" class="headerlink" title="背景知识"></a>背景知识</h3><h3 id="关于源码-1"><a href="#关于源码-1" class="headerlink" title="关于源码"></a>关于源码</h3><h4 id="onLayout-1"><a href="#onLayout-1" class="headerlink" title="onLayout"></a>onLayout</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLayout</span><span class="params">(<span class="keyword">boolean</span> changed, <span class="keyword">int</span> left, <span class="keyword">int</span> top, <span class="keyword">int</span> right, <span class="keyword">int</span> bottom)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onLayout(changed, left, top, right, bottom);</span><br><span class="line">    <span class="keyword">if</span> (mDeferScroll &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> curs = mDeferScroll;</span><br><span class="line">        mDeferScroll = -<span class="number">1</span>;</span><br><span class="line">        bringPointIntoView(Math.min(curs, mText.length()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="如何实现-1"><a href="#如何实现-1" class="headerlink" title="如何实现"></a>如何实现</h3><p>onLayout的事情主要还是交给 BoringLayout,DynamicLayout和StaticLayout</p>
+<ul>
+<li>[ ] <a href="//TODO 20170708">重点分析这三类Layout</a> </li>
+</ul>
+<h2 id="onDraw"><a href="#onDraw" class="headerlink" title="onDraw"></a>onDraw</h2><h3 id="调用流程-2"><a href="#调用流程-2" class="headerlink" title="调用流程"></a>调用流程</h3><p><img src="/Users/jinsan/Downloads/onDraw时序图.png" alt="onDraw时序图"></p>
+<h3 id="背景知识-2"><a href="#背景知识-2" class="headerlink" title="背景知识"></a>背景知识</h3><h4 id="View的draw做了些什么"><a href="#View的draw做了些什么" class="headerlink" title="View的draw做了些什么"></a>View的draw做了些什么</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * Draw traversal performs several drawing steps which must be executed</span><br><span class="line"> * in the appropriate order:</span><br><span class="line"> *</span><br><span class="line"> *      1. Draw the background//画背景色</span><br><span class="line"> *      2. If necessary, save the canvas&apos; layers to prepare for fading//保存渐变图层</span><br><span class="line"> *      3. Draw view&apos;s content//画内容 onDraw，所有的view子类都是通过它提供不同的视觉效果的</span><br><span class="line"> *      4. Draw children//到viewgroup那里去绕一圈，在通过child.draw回来</span><br><span class="line"> *      5. If necessary, draw the fading edges and restore layers//画渐变色图层,在开发中实际用的不多</span><br><span class="line"> *      6. Draw decorations (scrollbars for instance)//画一些装饰门面,比如滚动条</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+<h4 id="onDraw-1"><a href="#onDraw-1" class="headerlink" title="onDraw()"></a>onDraw()</h4><ul>
+<li>[ ] <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">        restartMarqueeIfNeeded();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Draw the background for this view</span></span><br><span class="line">        <span class="keyword">super</span>.onDraw(canvas);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> compoundPaddingLeft = getCompoundPaddingLeft();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> compoundPaddingTop = getCompoundPaddingTop();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> compoundPaddingRight = getCompoundPaddingRight();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> compoundPaddingBottom = getCompoundPaddingBottom();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> scrollX = mScrollX;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> scrollY = mScrollY;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> right = mRight;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> left = mLeft;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> bottom = mBottom;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> top = mTop;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> isLayoutRtl = isLayoutRtl();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> offset = getHorizontalOffsetForDrawables();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> leftOffset = isLayoutRtl ? <span class="number">0</span> : offset;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> rightOffset = isLayoutRtl ? offset : <span class="number">0</span> ;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//----------step1 ---------drawableLeft....------------------------------</span></span><br><span class="line">        <span class="keyword">final</span> Drawables dr = mDrawables;</span><br><span class="line">        <span class="keyword">if</span> (dr != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">             * Compound, not extended, because the icon is not clipped</span></span><br><span class="line"><span class="comment">             * if the text height is smaller.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> vspace = bottom - top - compoundPaddingBottom - compoundPaddingTop;</span><br><span class="line">            <span class="keyword">int</span> hspace = right - left - compoundPaddingRight - compoundPaddingLeft;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// IMPORTANT: The coordinates computed are also used in invalidateDrawable()</span></span><br><span class="line">            <span class="comment">// Make sure to update invalidateDrawable() when changing this code.</span></span><br><span class="line">          <span class="comment">//理解下面的代码，可以知道drawableLeft或者其他，比如2行会怎么显示，比如有自带滚动条会怎么显示</span></span><br><span class="line">            <span class="keyword">if</span> (dr.mShowing[Drawables.LEFT] != <span class="keyword">null</span>) &#123;</span><br><span class="line">                canvas.save();</span><br><span class="line">              <span class="comment">//最左边的中点开始画leftDrawable,paddingLef和scrollX在drawable的左边</span></span><br><span class="line">              <span class="comment">//翻阅资料 scrollX是滚动的偏移量(起点－终点坐标),+scrollX保证了图片不会随着跑马灯滚动</span></span><br><span class="line">                canvas.translate(scrollX + mPaddingLeft + leftOffset,</span><br><span class="line">                                 scrollY + compoundPaddingTop +</span><br><span class="line">                                 (vspace - dr.mDrawableHeightLeft) / <span class="number">2</span>);</span><br><span class="line">                dr.mShowing[Drawables.LEFT].draw(canvas);</span><br><span class="line">                canvas.restore();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// IMPORTANT: The coordinates computed are also used in invalidateDrawable()</span></span><br><span class="line">            <span class="comment">// Make sure to update invalidateDrawable() when changing this code.</span></span><br><span class="line">            <span class="keyword">if</span> (dr.mShowing[Drawables.RIGHT] != <span class="keyword">null</span>) &#123;</span><br><span class="line">                canvas.save();</span><br><span class="line">              <span class="comment">//减的意思就是这个值在它的右边其作用，加代表这个值在他左边起作用</span></span><br><span class="line">                canvas.translate(scrollX + right - left - mPaddingRight</span><br><span class="line">                        - dr.mDrawableSizeRight - rightOffset,</span><br><span class="line">                         scrollY + compoundPaddingTop + (vspace - dr.mDrawableHeightRight) / <span class="number">2</span>);</span><br><span class="line">                dr.mShowing[Drawables.RIGHT].draw(canvas);</span><br><span class="line">                canvas.restore();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// IMPORTANT: The coordinates computed are also used in invalidateDrawable()</span></span><br><span class="line">            <span class="comment">// Make sure to update invalidateDrawable() when changing this code.</span></span><br><span class="line">            <span class="keyword">if</span> (dr.mShowing[Drawables.TOP] != <span class="keyword">null</span>) &#123;</span><br><span class="line">                canvas.save();</span><br><span class="line">              <span class="comment">//最上面的中点开始画drawableTop,scrollX和paddingLeft始终在其左边</span></span><br><span class="line">                canvas.translate(scrollX + compoundPaddingLeft +</span><br><span class="line">                        (hspace - dr.mDrawableWidthTop) / <span class="number">2</span>, scrollY + mPaddingTop);</span><br><span class="line">                dr.mShowing[Drawables.TOP].draw(canvas);</span><br><span class="line">                canvas.restore();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// IMPORTANT: The coordinates computed are also used in invalidateDrawable()</span></span><br><span class="line">            <span class="comment">// Make sure to update invalidateDrawable() when changing this code.</span></span><br><span class="line">          <span class="comment">//x = scrollx+compaddingLeft+(hspace-drawableWidth)/2  -------bingo</span></span><br><span class="line">          <span class="comment">//y =  scrollY+(bottom-top-compaddingButton-drawableHeight) -------bingo</span></span><br><span class="line">             <span class="keyword">if</span> (dr.mShowing[Drawables.BOTTOM] != <span class="keyword">null</span>) &#123;</span><br><span class="line">                canvas.save();</span><br><span class="line">                canvas.translate(scrollX + compoundPaddingLeft +</span><br><span class="line">                        (hspace - dr.mDrawableWidthBottom) / <span class="number">2</span>,</span><br><span class="line">                         scrollY + bottom - top - mPaddingBottom - dr.mDrawableSizeBottom);</span><br><span class="line">                dr.mShowing[Drawables.BOTTOM].draw(canvas);</span><br><span class="line">                canvas.restore();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> color = mCurTextColor;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mLayout == <span class="keyword">null</span>) &#123;</span><br><span class="line">            assumeLayout();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Layout layout = mLayout;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mHint != <span class="keyword">null</span> &amp;&amp; mText.length() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mHintTextColor != <span class="keyword">null</span>) &#123;</span><br><span class="line">                color = mCurHintTextColor;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            layout = mHintLayout;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mTextPaint.setColor(color);</span><br><span class="line">        mTextPaint.drawableState = getDrawableState();</span><br><span class="line"><span class="comment">//-------------step 2 ---------------文字阴影----------------------</span></span><br><span class="line">        canvas.save();</span><br><span class="line">        <span class="comment">/*  Would be faster if we didn't have to do this. Can we chop the</span></span><br><span class="line"><span class="comment">            (displayable) text so that we don't need to do this ever?</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> extendedPaddingTop = getExtendedPaddingTop();</span><br><span class="line">        <span class="keyword">int</span> extendedPaddingBottom = getExtendedPaddingBottom();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> vspace = mBottom - mTop - compoundPaddingBottom - compoundPaddingTop;</span><br><span class="line">        <span class="comment">//TODO why getHeight() equals getLineTop(getLineCount)?//api注释应该在layout基类里实现了</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> maxScrollY = mLayout.getHeight() - vspace;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">float</span> clipLeft = compoundPaddingLeft + scrollX;</span><br><span class="line">        <span class="keyword">float</span> clipTop = (scrollY == <span class="number">0</span>) ? <span class="number">0</span> : extendedPaddingTop + scrollY;</span><br><span class="line">        <span class="keyword">float</span> clipRight = right - left - getFudgedPaddingRight() + scrollX;</span><br><span class="line">        <span class="keyword">float</span> clipBottom = bottom - top + scrollY -</span><br><span class="line">                ((scrollY == maxScrollY) ? <span class="number">0</span> : extendedPaddingBottom);</span><br><span class="line">        <span class="comment">//TODO how to make mShadowRadius successfully</span></span><br><span class="line">      <span class="comment">//这里只是切范围，阴影应该在textPaint里面处理的</span></span><br><span class="line">        <span class="keyword">if</span> (mShadowRadius != <span class="number">0</span>) &#123;</span><br><span class="line">            clipLeft += Math.min(<span class="number">0</span>, mShadowDx - mShadowRadius);</span><br><span class="line">            clipRight += Math.max(<span class="number">0</span>, mShadowDx + mShadowRadius);</span><br><span class="line"></span><br><span class="line">            clipTop += Math.min(<span class="number">0</span>, mShadowDy - mShadowRadius);</span><br><span class="line">            clipBottom += Math.max(<span class="number">0</span>, mShadowDy + mShadowRadius);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        canvas.clipRect(clipLeft, clipTop, clipRight, clipBottom);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> voffsetText = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> voffsetCursor = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// translate in by our padding</span></span><br><span class="line">        <span class="comment">/* shortcircuit calling getVerticaOffset() */</span></span><br><span class="line">        <span class="keyword">if</span> ((mGravity &amp; Gravity.VERTICAL_GRAVITY_MASK) != Gravity.TOP) &#123;</span><br><span class="line">            voffsetText = getVerticalOffset(<span class="keyword">false</span>);</span><br><span class="line">            voffsetCursor = getVerticalOffset(<span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        canvas.translate(compoundPaddingLeft, extendedPaddingTop + voffsetText);</span><br><span class="line"><span class="comment">//－－－－－－－－－step 3 －－－－－－－－－－初始化跑马灯的初始化状态</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> layoutDirection = getLayoutDirection();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> absoluteGravity = Gravity.getAbsoluteGravity(mGravity, layoutDirection);</span><br><span class="line">        <span class="keyword">if</span> (mEllipsize == TextUtils.TruncateAt.MARQUEE &amp;&amp;</span><br><span class="line">                mMarqueeFadeMode != MARQUEE_FADE_SWITCH_SHOW_ELLIPSIS) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!mSingleLine &amp;&amp; getLineCount() == <span class="number">1</span> &amp;&amp; canMarquee() &amp;&amp;</span><br><span class="line">                    (absoluteGravity &amp; Gravity.HORIZONTAL_GRAVITY_MASK) != Gravity.LEFT) &#123;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">int</span> width = mRight - mLeft;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">int</span> padding = getCompoundPaddingLeft() + getCompoundPaddingRight();</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">float</span> dx = mLayout.getLineRight(<span class="number">0</span>) - (width - padding);</span><br><span class="line">                canvas.translate(layout.getParagraphDirection(<span class="number">0</span>) * dx, <span class="number">0.0f</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (mMarquee != <span class="keyword">null</span> &amp;&amp; mMarquee.isRunning()) &#123;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">float</span> dx = -mMarquee.getScroll();</span><br><span class="line">                canvas.translate(layout.getParagraphDirection(<span class="number">0</span>) * dx, <span class="number">0.0f</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> cursorOffsetVertical = voffsetCursor - voffsetText;</span><br><span class="line"><span class="comment">//-----------step 4 ------------------------画文字----------------------</span></span><br><span class="line">        Path highlight = getUpdatedHighlightPath();</span><br><span class="line">        <span class="keyword">if</span> (mEditor != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mEditor.onDraw(canvas, layout, highlight, mHighlightPaint, cursorOffsetVertical);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            layout.draw(canvas, highlight, mHighlightPaint, cursorOffsetVertical);</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//-------------step 5 -----------------开始跑马灯的效果－－－－－－－－</span></span><br><span class="line">        <span class="keyword">if</span> (mMarquee != <span class="keyword">null</span> &amp;&amp; mMarquee.shouldDrawGhost()) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">float</span> dx = mMarquee.getGhostOffset();</span><br><span class="line">            canvas.translate(layout.getParagraphDirection(<span class="number">0</span>) * dx, <span class="number">0.0f</span>);</span><br><span class="line">            layout.draw(canvas, highlight, mHighlightPaint, cursorOffsetVertical);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        canvas.restore();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="Layout-draw"><a href="#Layout-draw" class="headerlink" title="Layout:draw"></a>Layout:draw</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * Draw this Layout on the specified canvas, with the highlight path drawn</span></span><br><span class="line"><span class="comment">  * between the background and the text.</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> canvas the canvas</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> highlight the path of the highlight or cursor; can be null</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> highlightPaint the paint for the highlight</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> cursorOffsetVertical the amount to temporarily translate the</span></span><br><span class="line"><span class="comment">  *        canvas while rendering the highlight</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(Canvas canvas, Path highlight, Paint highlightPaint,</span></span></span><br><span class="line"><span class="function"><span class="params">         <span class="keyword">int</span> cursorOffsetVertical)</span> </span>&#123;</span><br><span class="line">   <span class="comment">//根据getClipBounds获取了top和bottom,然后组成了一个long值</span></span><br><span class="line">     <span class="keyword">final</span> <span class="keyword">long</span> lineRange = getLineRangeForDraw(canvas);</span><br><span class="line">     <span class="keyword">int</span> firstLine = TextUtils.unpackRangeStartFromLong(lineRange);</span><br><span class="line">     <span class="keyword">int</span> lastLine = TextUtils.unpackRangeEndFromLong(lineRange);</span><br><span class="line">     <span class="keyword">if</span> (lastLine &lt; <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//highLight或者是linebackgroudSpan </span></span><br><span class="line">   drawBackground(canvas, highlight, highlightPaint, cursorOffsetVertical,</span><br><span class="line">             firstLine, lastLine);</span><br><span class="line">   </span><br><span class="line">   drawText(canvas, firstLine, lastLine);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Layout-drawText"><a href="#Layout-drawText" class="headerlink" title="Layout:drawText"></a>Layout:drawText</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@hide</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">drawText</span><span class="params">(Canvas canvas, <span class="keyword">int</span> firstLine, <span class="keyword">int</span> lastLine)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> previousLineBottom = getLineTop(firstLine);</span><br><span class="line">    <span class="keyword">int</span> previousLineEnd = getLineStart(firstLine);</span><br><span class="line">    ParagraphStyle[] spans = NO_PARA_SPANS;</span><br><span class="line">    <span class="keyword">int</span> spanEnd = <span class="number">0</span>;</span><br><span class="line">    TextPaint paint = mPaint;</span><br><span class="line">    CharSequence buf = mText;</span><br><span class="line"></span><br><span class="line">    Alignment paraAlign = mAlignment;</span><br><span class="line">    TabStops tabStops = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">boolean</span> tabStopsIsInitialized = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    TextLine tl = TextLine.obtain();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Draw the lines, one at a time.</span></span><br><span class="line">    <span class="comment">// The baseline is the top of the following line minus the current line's descent.</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> lineNum = firstLine; lineNum &lt;= lastLine; lineNum++) &#123;</span><br><span class="line">        <span class="keyword">int</span> start = previousLineEnd;</span><br><span class="line">        previousLineEnd = getLineStart(lineNum + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">int</span> end = getLineVisibleEnd(lineNum, start, previousLineEnd);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ltop = previousLineBottom;</span><br><span class="line">        <span class="keyword">int</span> lbottom = getLineTop(lineNum + <span class="number">1</span>);</span><br><span class="line">        previousLineBottom = lbottom;</span><br><span class="line">        <span class="keyword">int</span> lbaseline = lbottom - getLineDescent(lineNum);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> dir = getParagraphDirection(lineNum);</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> right = mWidth;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mSpannedText) &#123;</span><br><span class="line">            Spanned sp = (Spanned) buf;</span><br><span class="line">            <span class="keyword">int</span> textLength = buf.length();</span><br><span class="line">            <span class="keyword">boolean</span> isFirstParaLine = (start == <span class="number">0</span> || buf.charAt(start - <span class="number">1</span>) == <span class="string">'\n'</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// New batch of paragraph styles, collect into spans array.</span></span><br><span class="line">            <span class="comment">// Compute the alignment, last alignment style wins.</span></span><br><span class="line">            <span class="comment">// Reset tabStops, we'll rebuild if we encounter a line with</span></span><br><span class="line">            <span class="comment">// tabs.</span></span><br><span class="line">            <span class="comment">// We expect paragraph spans to be relatively infrequent, use</span></span><br><span class="line">            <span class="comment">// spanEnd so that we can check less frequently.  Since</span></span><br><span class="line">            <span class="comment">// paragraph styles ought to apply to entire paragraphs, we can</span></span><br><span class="line">            <span class="comment">// just collect the ones present at the start of the paragraph.</span></span><br><span class="line">            <span class="comment">// If spanEnd is before the end of the paragraph, that's not</span></span><br><span class="line">            <span class="comment">// our problem.</span></span><br><span class="line">            <span class="keyword">if</span> (start &gt;= spanEnd &amp;&amp; (lineNum == firstLine || isFirstParaLine)) &#123;</span><br><span class="line">                spanEnd = sp.nextSpanTransition(start, textLength,</span><br><span class="line">                                                ParagraphStyle.class);</span><br><span class="line">                spans = getParagraphSpans(sp, start, spanEnd, ParagraphStyle.class);</span><br><span class="line"></span><br><span class="line">                paraAlign = mAlignment;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> n = spans.length - <span class="number">1</span>; n &gt;= <span class="number">0</span>; n--) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (spans[n] <span class="keyword">instanceof</span> AlignmentSpan) &#123;</span><br><span class="line">                        paraAlign = ((AlignmentSpan) spans[n]).getAlignment();</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                tabStopsIsInitialized = <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Draw all leading margin spans.  Adjust left or right according</span></span><br><span class="line">            <span class="comment">// to the paragraph direction of the line.</span></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> length = spans.length;</span><br><span class="line">            <span class="keyword">boolean</span> useFirstLineMargin = isFirstParaLine;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> n = <span class="number">0</span>; n &lt; length; n++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (spans[n] <span class="keyword">instanceof</span> LeadingMarginSpan2) &#123;</span><br><span class="line">                    <span class="keyword">int</span> count = ((LeadingMarginSpan2) spans[n]).getLeadingMarginLineCount();</span><br><span class="line">                    <span class="keyword">int</span> startLine = getLineForOffset(sp.getSpanStart(spans[n]));</span><br><span class="line">                    <span class="comment">// if there is more than one LeadingMarginSpan2, use</span></span><br><span class="line">                    <span class="comment">// the count that is greatest</span></span><br><span class="line">                    <span class="keyword">if</span> (lineNum &lt; startLine + count) &#123;</span><br><span class="line">                        useFirstLineMargin = <span class="keyword">true</span>;</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> n = <span class="number">0</span>; n &lt; length; n++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (spans[n] <span class="keyword">instanceof</span> LeadingMarginSpan) &#123;</span><br><span class="line">                    LeadingMarginSpan margin = (LeadingMarginSpan) spans[n];</span><br><span class="line">                    <span class="keyword">if</span> (dir == DIR_RIGHT_TO_LEFT) &#123;</span><br><span class="line">                        margin.drawLeadingMargin(canvas, paint, right, dir, ltop,</span><br><span class="line">                                                 lbaseline, lbottom, buf,</span><br><span class="line">                                                 start, end, isFirstParaLine, <span class="keyword">this</span>);</span><br><span class="line">                        right -= margin.getLeadingMargin(useFirstLineMargin);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        margin.drawLeadingMargin(canvas, paint, left, dir, ltop,</span><br><span class="line">                                                 lbaseline, lbottom, buf,</span><br><span class="line">                                                 start, end, isFirstParaLine, <span class="keyword">this</span>);</span><br><span class="line">                        left += margin.getLeadingMargin(useFirstLineMargin);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> hasTabOrEmoji = getLineContainsTab(lineNum);</span><br><span class="line">        <span class="comment">// Can't tell if we have tabs for sure, currently</span></span><br><span class="line">        <span class="keyword">if</span> (hasTabOrEmoji &amp;&amp; !tabStopsIsInitialized) &#123;</span><br><span class="line">            <span class="keyword">if</span> (tabStops == <span class="keyword">null</span>) &#123;</span><br><span class="line">                tabStops = <span class="keyword">new</span> TabStops(TAB_INCREMENT, spans);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                tabStops.reset(TAB_INCREMENT, spans);</span><br><span class="line">            &#125;</span><br><span class="line">            tabStopsIsInitialized = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Determine whether the line aligns to normal, opposite, or center.</span></span><br><span class="line">        Alignment align = paraAlign;</span><br><span class="line">        <span class="keyword">if</span> (align == Alignment.ALIGN_LEFT) &#123;</span><br><span class="line">            align = (dir == DIR_LEFT_TO_RIGHT) ?</span><br><span class="line">                Alignment.ALIGN_NORMAL : Alignment.ALIGN_OPPOSITE;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (align == Alignment.ALIGN_RIGHT) &#123;</span><br><span class="line">            align = (dir == DIR_LEFT_TO_RIGHT) ?</span><br><span class="line">                Alignment.ALIGN_OPPOSITE : Alignment.ALIGN_NORMAL;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> x;</span><br><span class="line">        <span class="keyword">if</span> (align == Alignment.ALIGN_NORMAL) &#123;</span><br><span class="line">            <span class="keyword">if</span> (dir == DIR_LEFT_TO_RIGHT) &#123;</span><br><span class="line">                x = left + getIndentAdjust(lineNum, Alignment.ALIGN_LEFT);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                x = right + getIndentAdjust(lineNum, Alignment.ALIGN_RIGHT);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> max = (<span class="keyword">int</span>)getLineExtent(lineNum, tabStops, <span class="keyword">false</span>);</span><br><span class="line">            <span class="keyword">if</span> (align == Alignment.ALIGN_OPPOSITE) &#123;</span><br><span class="line">                <span class="keyword">if</span> (dir == DIR_LEFT_TO_RIGHT) &#123;</span><br><span class="line">                    x = right - max + getIndentAdjust(lineNum, Alignment.ALIGN_RIGHT);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    x = left - max + getIndentAdjust(lineNum, Alignment.ALIGN_LEFT);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; <span class="comment">// Alignment.ALIGN_CENTER</span></span><br><span class="line">                max = max &amp; ~<span class="number">1</span>;</span><br><span class="line">                x = ((right + left - max) &gt;&gt; <span class="number">1</span>) +</span><br><span class="line">                        getIndentAdjust(lineNum, Alignment.ALIGN_CENTER);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        paint.setHyphenEdit(getHyphen(lineNum));</span><br><span class="line">        Directions directions = getLineDirections(lineNum);</span><br><span class="line">        <span class="keyword">if</span> (directions == DIRS_ALL_LEFT_TO_RIGHT &amp;&amp; !mSpannedText &amp;&amp; !hasTabOrEmoji) &#123;</span><br><span class="line">          <span class="comment">//普通的</span></span><br><span class="line">            <span class="comment">// <span class="doctag">XXX:</span> assumes there's nothing additional to be done</span></span><br><span class="line">            canvas.drawText(buf, start, end, x, lbaseline, paint);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//emoji或者span的</span></span><br><span class="line">            tl.set(paint, buf, start, end, dir, directions, hasTabOrEmoji, tabStops);</span><br><span class="line">            tl.draw(canvas, x, ltop, lbaseline, lbottom);</span><br><span class="line">        &#125;</span><br><span class="line">        paint.setHyphenEdit(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    TextLine.recycle(tl);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Layout-elipsize-StaticLayout-getEllipsisCount-StaticLayout-getEllipsisStart"><a href="#Layout-elipsize-StaticLayout-getEllipsisCount-StaticLayout-getEllipsisStart" class="headerlink" title="Layout:elipsize+StaticLayout: getEllipsisCount+StaticLayout:getEllipsisStart"></a>Layout:elipsize+StaticLayout: getEllipsisCount+StaticLayout:getEllipsisStart</h4><h5 id="省略是怎么配合发生的"><a href="#省略是怎么配合发生的" class="headerlink" title="省略是怎么配合发生的"></a>省略是怎么配合发生的</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ellipsize</span><span class="params">(<span class="keyword">int</span> start, <span class="keyword">int</span> end, <span class="keyword">int</span> line,</span></span></span><br><span class="line"><span class="function"><span class="params">                           <span class="keyword">char</span>[] dest, <span class="keyword">int</span> destoff, TextUtils.TruncateAt method)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ellipsisCount = getEllipsisCount(line);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ellipsisCount == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ellipsisStart = getEllipsisStart(line);</span><br><span class="line">        <span class="keyword">int</span> linestart = getLineStart(line);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = ellipsisStart; i &lt; ellipsisStart + ellipsisCount; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (i == ellipsisStart) &#123;</span><br><span class="line">                c = getEllipsisChar(method); <span class="comment">// ellipsis</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                c = <span class="string">'\uFEFF'</span>; <span class="comment">// 0-width space</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> a = i + linestart;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (a &gt;= start &amp;&amp; a &lt; end) &#123;</span><br><span class="line">                dest[destoff + a - start] = c;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">---------------------------</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Return the offset of the first character to be ellipsized away,</span></span><br><span class="line"><span class="comment">     * relative to the start of the line.  (So 0 if the beginning of the</span></span><br><span class="line"><span class="comment">     * line is ellipsized, not getLineStart().)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">int</span> <span class="title">getEllipsisStart</span><span class="params">(<span class="keyword">int</span> line)</span></span>;</span><br><span class="line">------------------------</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the number of characters to be ellipsized away, or 0 if</span></span><br><span class="line"><span class="comment">     * no ellipsis is to take place.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">int</span> <span class="title">getEllipsisCount</span><span class="params">(<span class="keyword">int</span> line)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="TextLine-draw"><a href="#TextLine-draw" class="headerlink" title="TextLine:draw"></a>TextLine:draw</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Renders the TextLine.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> c the canvas to render on</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> x the leading margin position</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> top the top of the line</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> y the baseline</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> bottom the bottom of the line</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">draw</span><span class="params">(Canvas c, <span class="keyword">float</span> x, <span class="keyword">int</span> top, <span class="keyword">int</span> y, <span class="keyword">int</span> bottom)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!mHasTabs) &#123;</span><br><span class="line">        <span class="keyword">if</span> (mDirections == Layout.DIRS_ALL_LEFT_TO_RIGHT) &#123;</span><br><span class="line">            drawRun(c, <span class="number">0</span>, mLen, <span class="keyword">false</span>, x, top, y, bottom, <span class="keyword">false</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (mDirections == Layout.DIRS_ALL_RIGHT_TO_LEFT) &#123;</span><br><span class="line">            drawRun(c, <span class="number">0</span>, mLen, <span class="keyword">true</span>, x, top, y, bottom, <span class="keyword">false</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">float</span> h = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span>[] runs = mDirections.mDirections;</span><br><span class="line">    RectF emojiRect = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> lastRunIndex = runs.length - <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; runs.length; i += <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> runStart = runs[i];</span><br><span class="line">        <span class="keyword">int</span> runLimit = runStart + (runs[i+<span class="number">1</span>] &amp; Layout.RUN_LENGTH_MASK);</span><br><span class="line">        <span class="keyword">if</span> (runLimit &gt; mLen) &#123;</span><br><span class="line">            runLimit = mLen;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">boolean</span> runIsRtl = (runs[i+<span class="number">1</span>] &amp; Layout.RUN_RTL_FLAG) != <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> segstart = runStart;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = mHasTabs ? runStart : runLimit; j &lt;= runLimit; j++) &#123;</span><br><span class="line">            <span class="keyword">int</span> codept = <span class="number">0</span>;</span><br><span class="line">            Bitmap bm = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (mHasTabs &amp;&amp; j &lt; runLimit) &#123;</span><br><span class="line">              <span class="comment">//根据emojicode找到对应的bitmap,然后画上去</span></span><br><span class="line">                codept = mChars[j];</span><br><span class="line">                <span class="keyword">if</span> (codept &gt;= <span class="number">0xd800</span> &amp;&amp; codept &lt; <span class="number">0xdc00</span> &amp;&amp; j + <span class="number">1</span> &lt; runLimit) &#123;</span><br><span class="line">                    codept = Character.codePointAt(mChars, j);</span><br><span class="line">                    <span class="keyword">if</span> (codept &gt;= Layout.MIN_EMOJI &amp;&amp; codept &lt;= Layout.MAX_EMOJI) &#123;</span><br><span class="line">                        bm = Layout.EMOJI_FACTORY.getBitmapFromAndroidPua(codept);</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (codept &gt; <span class="number">0xffff</span>) &#123;</span><br><span class="line">                        ++j;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (j == runLimit || codept == <span class="string">'\t'</span> || bm != <span class="keyword">null</span>) &#123;</span><br><span class="line">                h += drawRun(c, segstart, j, runIsRtl, x+h, top, y, bottom,</span><br><span class="line">                        i != lastRunIndex || j != mLen);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (codept == <span class="string">'\t'</span>) &#123;</span><br><span class="line">                    h = mDir * nextTab(h * mDir);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (bm != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">float</span> bmAscent = ascent(j);</span><br><span class="line">                    <span class="keyword">float</span> bitmapHeight = bm.getHeight();</span><br><span class="line">                    <span class="keyword">float</span> scale = -bmAscent / bitmapHeight;</span><br><span class="line">                    <span class="keyword">float</span> width = bm.getWidth() * scale;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (emojiRect == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        emojiRect = <span class="keyword">new</span> RectF();</span><br><span class="line">                    &#125;</span><br><span class="line">                    emojiRect.set(x + h, y + bmAscent,</span><br><span class="line">                            x + h + width, y);</span><br><span class="line">                    c.drawBitmap(bm, <span class="keyword">null</span>, emojiRect, mPaint);</span><br><span class="line">                    h += width;</span><br><span class="line">                    j++;</span><br><span class="line">                &#125;</span><br><span class="line">                segstart = j + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="如何实现-2"><a href="#如何实现-2" class="headerlink" title="如何实现"></a>如何实现</h3><h4 id="跑马灯"><a href="#跑马灯" class="headerlink" title="跑马灯"></a>跑马灯</h4><h5 id="效果实现"><a href="#效果实现" class="headerlink" title="效果实现"></a>效果实现</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// If the size of the view does not depend on the size of the text, try to</span></span><br><span class="line">   <span class="comment">// start the marquee immediately</span></span><br><span class="line">   <span class="comment">// else Defer the start of the marquee until we know our width (see setFrame())</span></span><br><span class="line">     restartMarqueeIfNeeded();</span><br><span class="line"></span><br><span class="line">     <span class="comment">// Draw the background for this view</span></span><br><span class="line">     <span class="keyword">super</span>.onDraw(canvas);</span><br><span class="line"></span><br><span class="line">     <span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">final</span> <span class="keyword">int</span> layoutDirection = getLayoutDirection();</span><br><span class="line">     <span class="keyword">final</span> <span class="keyword">int</span> absoluteGravity = Gravity.getAbsoluteGravity(mGravity, layoutDirection);</span><br><span class="line">     <span class="keyword">if</span> (mEllipsize == TextUtils.TruncateAt.MARQUEE &amp;&amp;</span><br><span class="line">             mMarqueeFadeMode != MARQUEE_FADE_SWITCH_SHOW_ELLIPSIS) &#123;</span><br><span class="line">         <span class="keyword">if</span> (!mSingleLine &amp;&amp; getLineCount() == <span class="number">1</span> &amp;&amp; canMarquee() &amp;&amp;</span><br><span class="line">                 (absoluteGravity &amp; Gravity.HORIZONTAL_GRAVITY_MASK) != Gravity.LEFT) &#123;</span><br><span class="line">             <span class="keyword">final</span> <span class="keyword">int</span> width = mRight - mLeft;</span><br><span class="line">             <span class="keyword">final</span> <span class="keyword">int</span> padding = getCompoundPaddingLeft() + getCompoundPaddingRight();</span><br><span class="line">           <span class="comment">//getLineRight(0)</span></span><br><span class="line">             <span class="keyword">final</span> <span class="keyword">float</span> dx = mLayout.getLineRight(<span class="number">0</span>) - (width - padding);</span><br><span class="line">             canvas.translate(layout.getParagraphDirection(<span class="number">0</span>) * dx, <span class="number">0.0f</span>);</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">if</span> (mMarquee != <span class="keyword">null</span> &amp;&amp; mMarquee.isRunning()) &#123;</span><br><span class="line">           <span class="comment">//跑马灯位置更新的点</span></span><br><span class="line">             <span class="keyword">final</span> <span class="keyword">float</span> dx = -mMarquee.getScroll();</span><br><span class="line">             <span class="comment">//跑马灯</span></span><br><span class="line">             canvas.translate(layout.getParagraphDirection(<span class="number">0</span>) * dx, <span class="number">0.0f</span>);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="数值更新"><a href="#数值更新" class="headerlink" title="数值更新"></a>数值更新</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Marquee</span> </span>&#123;</span><br><span class="line">   <span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">private</span> Choreographer.FrameCallback mTickCallback = <span class="keyword">new</span> Choreographer.FrameCallback() &#123;</span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFrame</span><span class="params">(<span class="keyword">long</span> frameTimeNanos)</span> </span>&#123;</span><br><span class="line">             tick();</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span></span><br><span class="line">      <span class="comment">//滴答</span></span><br><span class="line">     <span class="function"><span class="keyword">void</span> <span class="title">tick</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         <span class="keyword">if</span> (mStatus != MARQUEE_RUNNING) &#123;</span><br><span class="line">             <span class="keyword">return</span>;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         mChoreographer.removeFrameCallback(mTickCallback);</span><br><span class="line"></span><br><span class="line">         <span class="keyword">final</span> TextView textView = mView.get();</span><br><span class="line">         <span class="keyword">if</span> (textView != <span class="keyword">null</span> &amp;&amp; (textView.isFocused() || textView.isSelected())) &#123;</span><br><span class="line">             <span class="keyword">long</span> currentMs = mChoreographer.getFrameTime();</span><br><span class="line">             <span class="keyword">long</span> deltaMs = currentMs - mLastAnimationMs;</span><br><span class="line">             mLastAnimationMs = currentMs;</span><br><span class="line">             <span class="keyword">float</span> deltaPx = deltaMs / <span class="number">1000f</span> * mPixelsPerSecond;</span><br><span class="line">            <span class="comment">//根据deltaMs计算出deltaPx的值,然后更新mScroll的值</span></span><br><span class="line">             mScroll += deltaPx;</span><br><span class="line">             <span class="keyword">if</span> (mScroll &gt; mMaxScroll) &#123;</span><br><span class="line">                 mScroll = mMaxScroll;</span><br><span class="line">                 mChoreographer.postFrameCallbackDelayed(mRestartCallback, MARQUEE_DELAY);</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 mChoreographer.postFrameCallback(mTickCallback);</span><br><span class="line">             &#125;</span><br><span class="line">             textView.invalidate();</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line"><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span><span class="string">''</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="文字缓存"><a href="#文字缓存" class="headerlink" title="文字缓存"></a>文字缓存</h3><p><a href="https://github.com/facebookincubator/TextLayoutBuilder[Todo" target="_blank" rel="noopener">https://github.com/facebookincubator/TextLayoutBuilder[Todo</a> 0812]</p>
+<h3 id="Layout的方法论"><a href="#Layout的方法论" class="headerlink" title="Layout的方法论"></a>Layout的方法论</h3><p><img src="/images/TextView_Method.png" alt="TextView_Method"></p>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><p>缺少两张图 (onMeasure 时序图, onDraw  时序图）</p>
+<ul>
+<li>[ ] <a href="//TODO 20170708">imageSpan的继承关系和实现形式</a></li>
+<li>[ ] <a href="//TODO 20170708">重点分析这三类Layout</a> </li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2017/08/06/TextView 源码解读篇/" title="TextView 源码解读篇">http://jinjian.info/2017/08/06/TextView 源码解读篇/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RTFSC-Read-the-fucking-source-code/" rel="tag"># RTFSC (Read the fucking source code )</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/22/CCAI2017人工智能大会见闻/" rel="next" title="CCAI2017人工智能大会总结">
+                <i class="fa fa-chevron-left"></i> CCAI2017人工智能大会总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/07/Animation源码解读/" rel="prev" title="Animation 源码解读篇">
+                Animation 源码解读篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#OverView"><span class="nav-number">1.</span> <span class="nav-text">OverView</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#onMeasure"><span class="nav-number">2.</span> <span class="nav-text">onMeasure</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用流程"><span class="nav-number">2.1.</span> <span class="nav-text">调用流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#时序图"><span class="nav-number">2.1.1.</span> <span class="nav-text">时序图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#背景知识"><span class="nav-number">2.2.</span> <span class="nav-text">背景知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于源码"><span class="nav-number">2.3.</span> <span class="nav-text">关于源码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#onMeasure-1"><span class="nav-number">2.3.1.</span> <span class="nav-text">onMeasure</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#makeNewLayout"><span class="nav-number">2.3.2.</span> <span class="nav-text">makeNewLayout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#makeSingleLayout"><span class="nav-number">2.3.3.</span> <span class="nav-text">makeSingleLayout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关键路径"><span class="nav-number">2.3.4.</span> <span class="nav-text">关键路径</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何实现"><span class="nav-number">2.4.</span> <span class="nav-text">如何实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#行间距和字间距实现"><span class="nav-number">2.4.1.</span> <span class="nav-text">行间距和字间距实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何判断换行"><span class="nav-number">2.4.2.</span> <span class="nav-text">如何判断换行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何实现文字省略"><span class="nav-number">2.4.3.</span> <span class="nav-text">如何实现文字省略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何实现emoji的统一替换"><span class="nav-number">2.4.4.</span> <span class="nav-text">如何实现emoji的统一替换</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#onLayout"><span class="nav-number">3.</span> <span class="nav-text">onLayout</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用流程-1"><span class="nav-number">3.1.</span> <span class="nav-text">调用流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#背景知识-1"><span class="nav-number">3.2.</span> <span class="nav-text">背景知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于源码-1"><span class="nav-number">3.3.</span> <span class="nav-text">关于源码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#onLayout-1"><span class="nav-number">3.3.1.</span> <span class="nav-text">onLayout</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何实现-1"><span class="nav-number">3.4.</span> <span class="nav-text">如何实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#onDraw"><span class="nav-number">4.</span> <span class="nav-text">onDraw</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用流程-2"><span class="nav-number">4.1.</span> <span class="nav-text">调用流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#背景知识-2"><span class="nav-number">4.2.</span> <span class="nav-text">背景知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#View的draw做了些什么"><span class="nav-number">4.2.1.</span> <span class="nav-text">View的draw做了些什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onDraw-1"><span class="nav-number">4.2.2.</span> <span class="nav-text">onDraw()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Layout-draw"><span class="nav-number">4.2.3.</span> <span class="nav-text">Layout:draw</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Layout-drawText"><span class="nav-number">4.2.4.</span> <span class="nav-text">Layout:drawText</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Layout-elipsize-StaticLayout-getEllipsisCount-StaticLayout-getEllipsisStart"><span class="nav-number">4.2.5.</span> <span class="nav-text">Layout:elipsize+StaticLayout: getEllipsisCount+StaticLayout:getEllipsisStart</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#省略是怎么配合发生的"><span class="nav-number">4.2.5.1.</span> <span class="nav-text">省略是怎么配合发生的</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TextLine-draw"><span class="nav-number">4.2.6.</span> <span class="nav-text">TextLine:draw</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何实现-2"><span class="nav-number">4.3.</span> <span class="nav-text">如何实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#跑马灯"><span class="nav-number">4.3.1.</span> <span class="nav-text">跑马灯</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#效果实现"><span class="nav-number">4.3.1.1.</span> <span class="nav-text">效果实现</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#数值更新"><span class="nav-number">4.3.1.2.</span> <span class="nav-text">数值更新</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">5.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文字缓存"><span class="nav-number">5.1.</span> <span class="nav-text">文字缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Layout的方法论"><span class="nav-number">5.2.</span> <span class="nav-text">Layout的方法论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TODO"><span class="nav-number">6.</span> <span class="nav-text">TODO</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

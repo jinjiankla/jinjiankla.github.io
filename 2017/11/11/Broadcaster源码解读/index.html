@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="RTFSC (Read the fucking source code )," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire 2.0" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="注册广播动态注册时序图 广播的存储 静态注册12345678/**  ResolveInfo has member ActivityInfo,witch The activity or broadcast receiver that corresponds to this resolution match, if this resolution is for an activity or broa">
+<meta name="keywords" content="RTFSC (Read the fucking source code )">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Broadcaster源码解读">
+<meta property="og:url" content="http://jinjian.info/2017/11/11/Broadcaster源码解读/index.html">
+<meta property="og:site_name" content="Desire 2.0">
+<meta property="og:description" content="注册广播动态注册时序图 广播的存储 静态注册12345678/**  ResolveInfo has member ActivityInfo,witch The activity or broadcast receiver that corresponds to this resolution match, if this resolution is for an activity or broa">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://jinjian.info/images/BroadCaster_Register.png">
+<meta property="og:image" content="http://jinjian.info/images/BroadCaster_How_TO.png">
+<meta property="og:image" content="http://jinjian.info/images/BroadCaster_EventBus.png">
+<meta property="og:updated_time" content="2017-12-23T19:39:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Broadcaster源码解读">
+<meta name="twitter:description" content="注册广播动态注册时序图 广播的存储 静态注册12345678/**  ResolveInfo has member ActivityInfo,witch The activity or broadcast receiver that corresponds to this resolution match, if this resolution is for an activity or broa">
+<meta name="twitter:image" content="http://jinjian.info/images/BroadCaster_Register.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2017/11/11/Broadcaster源码解读/"/>
+
+
+
+
+
+  <title>Broadcaster源码解读 | Desire 2.0</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire 2.0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2017/11/11/Broadcaster源码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire 2.0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Broadcaster源码解读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-11T00:00:00+08:00">
+                2017-11-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读别人的源码，涨自己的智慧/" itemprop="url" rel="index">
+                    <span itemprop="name">读别人的源码，涨自己的智慧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3,418字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  20分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="注册广播"><a href="#注册广播" class="headerlink" title="注册广播"></a>注册广播</h2><h3 id="动态注册"><a href="#动态注册" class="headerlink" title="动态注册"></a>动态注册</h3><h4 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h4><p><img src="/images/BroadCaster_Register.png" alt="register"></p>
+<h4 id="广播的存储"><a href="#广播的存储" class="headerlink" title="广播的存储"></a>广播的存储</h4><p><img src="/images/BroadCaster_How_TO.png" alt="BroadCaster_How_TO"></p>
+<h3 id="静态注册"><a href="#静态注册" class="headerlink" title="静态注册"></a>静态注册</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  ResolveInfo has member ActivityInfo,witch</span></span><br><span class="line"><span class="comment"> The activity or broadcast receiver that corresponds to this resolution</span></span><br><span class="line"><span class="comment"> match, if this resolution is for an activity or broadcast receiver. </span></span><br><span class="line"><span class="comment"> **/</span> </span><br><span class="line">Route:</span><br><span class="line">ActivityManagerService collectReceiverComponents -&gt; </span><br><span class="line">PackageManagerService queryIntentReceivers:List&lt;ResolveInfo&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="发送广播"><a href="#发送广播" class="headerlink" title="发送广播"></a>发送广播</h2><h3 id="路径"><a href="#路径" class="headerlink" title="路径"></a>路径</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">context sendBroadcast-&gt; </span><br><span class="line">contextImpl sendBroadcast -&gt; </span><br><span class="line">ActivityManagerService broadcastIntent[src] -&gt; </span><br><span class="line">ActivityManagerService broadcastIntentLocked [src]-&gt; </span><br><span class="line">BroadcastQueue.scheduleBroadcastsLocked()-&gt;</span><br><span class="line">BroadcastQueue.processNextBroadcast -&gt;</span><br><span class="line">BroadcastQueue.deliverToRegisteredReceiverLocked-&gt;</span><br><span class="line">BroadcastQueue.performReceiveLocked -&gt; <span class="comment">//two ways </span></span><br><span class="line">app.thread.scheduleRegisteredReceiver(receiver, intent, resultCode,data, extras, ordered, sticky,    sendingUser, app.repProcState)[here app.thread = activityThread.ApplicationThread ; receiver =  LoadApk.IIntentReceiver receiver] -&gt;</span><br><span class="line">LoadApk.performReceive()-&gt;</span><br><span class="line">LoadApk.Args.run()-&gt;</span><br><span class="line">receiver.onReceive(mContext, intent)</span><br></pre></td></tr></table></figure>
+<h3 id="broadcastIntent"><a href="#broadcastIntent" class="headerlink" title="broadcastIntent"></a>broadcastIntent</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * callingPid:// process indetify. </span></span><br><span class="line"><span class="comment"> * callingUid:// for indetify the same user ,use this id to read and write share datas cross     multify app;</span></span><br><span class="line"><span class="comment"> *             // if uid is same ,first your should use the same signature</span></span><br><span class="line"><span class="comment"> * -------------</span></span><br><span class="line"><span class="comment"> * pid simply used by if(pid == MY_PID)</span></span><br><span class="line"><span class="comment"> *  ------------</span></span><br><span class="line"><span class="comment"> * uid = userId * 100000  + appId</span></span><br><span class="line"><span class="comment"> * -------------</span></span><br><span class="line"><span class="comment"> * Relative Method:</span></span><br><span class="line"><span class="comment"> * isSameUser	    比较两个uid的userId是否相同</span></span><br><span class="line"><span class="comment"> * isSameApp	    比较两个uid的appId是否相同</span></span><br><span class="line"><span class="comment"> * isApp	        appId是否属于区间[10000,19999]</span></span><br><span class="line"><span class="comment"> * isIsolated	    appId是否属于区间[99000,99999]</span></span><br><span class="line"><span class="comment"> * getIdentifier	获取UserHandle所对应的userId</span></span><br><span class="line"><span class="comment"> * -------------</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> caller</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> intent</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> resolvedType</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> resultTo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> resultCode</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> resultData</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> resultExtras</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> requiredPermissions</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> appOp</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> options</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> serialized</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> sticky</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">broadcastIntent</span><span class="params">(IApplicationThread caller,</span></span></span><br><span class="line"><span class="function"><span class="params">        Intent intent, String resolvedType, IIntentReceiver resultTo,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int</span> resultCode, String resultData, Bundle resultExtras,</span></span></span><br><span class="line"><span class="function"><span class="params">        String[] requiredPermissions, <span class="keyword">int</span> appOp, Bundle options,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">boolean</span> serialized, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> userId)</span> </span>&#123;</span><br><span class="line">    enforceNotIsolatedCaller(<span class="string">"broadcastIntent"</span>);</span><br><span class="line">    <span class="keyword">synchronized</span>(<span class="keyword">this</span>) &#123;</span><br><span class="line">        intent = verifyBroadcastLocked(intent);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> ProcessRecord callerApp = getRecordForAppLocked(caller);</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> callingPid = Binder.getCallingPid();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> callingUid = Binder.getCallingUid();</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">long</span> origId = Binder.clearCallingIdentity();</span><br><span class="line">        <span class="keyword">int</span> res = broadcastIntentLocked(callerApp,</span><br><span class="line">                callerApp != <span class="keyword">null</span> ? callerApp.info.packageName : <span class="keyword">null</span>,</span><br><span class="line">                intent, resolvedType, resultTo, resultCode, resultData, resultExtras,</span><br><span class="line">                requiredPermissions, appOp, <span class="keyword">null</span>, serialized, sticky,</span><br><span class="line">                callingPid, callingUid, userId);</span><br><span class="line">        Binder.restoreCallingIdentity(origId);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="broadcastIntentLocked"><a href="#broadcastIntentLocked" class="headerlink" title="broadcastIntentLocked"></a>broadcastIntentLocked</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br></pre></td><td class="code"><pre><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Things to do:</span></span><br><span class="line"><span class="comment">     * 1.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES) protected the app which is not running even or kill the</span></span><br><span class="line"><span class="comment">     * process by user control</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 2.deal with protection () uid,phoneid or isProtectedBroadcast(eg:screen on ,screen off )</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 3.deal with package BroadCast(eg: remove ,add etc.) and systerm BroadCast (eg:Intent.ACTION_TIMEZONE_CHANGED )</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 4.update stick broadcast.record the broadcast if it is not start</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 5.queue.enqueueParallelBroadcastLocked(r);//add</span></span><br><span class="line"><span class="comment">     *   queue.scheduleBroadcastsLocked();//deliver[ruler comes into BroadcastQueue.processNextBroadcast()]</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> callerApp</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> callerPackage</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> intent</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> resolvedType</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> resultTo</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> resultCode</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> resultData</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> resultExtras</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requiredPermissions</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> appOp</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> options</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> ordered</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> sticky</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> callingPid</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> callingUid</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> userId</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">broadcastIntentLocked</span><span class="params">(ProcessRecord callerApp,</span></span></span><br><span class="line"><span class="function"><span class="params">            String callerPackage, Intent intent, String resolvedType,</span></span></span><br><span class="line"><span class="function"><span class="params">            IIntentReceiver resultTo, <span class="keyword">int</span> resultCode, String resultData,</span></span></span><br><span class="line"><span class="function"><span class="params">            Bundle resultExtras, String[] requiredPermissions, <span class="keyword">int</span> appOp, Bundle options,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> ordered, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> callingPid, <span class="keyword">int</span> callingUid, <span class="keyword">int</span> userId)</span> </span>&#123;</span><br><span class="line">        intent = <span class="keyword">new</span> Intent(intent);</span><br><span class="line"></span><br><span class="line">      <span class="comment">//1.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES) protected the app which is not running  e ven or kill the process by user control</span></span><br><span class="line">      </span><br><span class="line">        <span class="comment">// By default broadcasts do not go to stopped apps.</span></span><br><span class="line">        intent.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If we have not finished booting, don't allow this to launch new processes.</span></span><br><span class="line">        <span class="keyword">if</span> (!mProcessesReady &amp;&amp; (intent.getFlags()&amp;Intent.FLAG_RECEIVER_BOOT_UPGRADE) == <span class="number">0</span>) &#123;</span><br><span class="line">            intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (DEBUG_BROADCAST_LIGHT) Slog.v(TAG_BROADCAST,</span><br><span class="line">                (sticky ? <span class="string">"Broadcast sticky: "</span>: <span class="string">"Broadcast: "</span>) + intent</span><br><span class="line">                + <span class="string">" ordered="</span> + ordered + <span class="string">" userid="</span> + userId);</span><br><span class="line">        <span class="keyword">if</span> ((resultTo != <span class="keyword">null</span>) &amp;&amp; !ordered) &#123;</span><br><span class="line">            Slog.w(TAG, <span class="string">"Broadcast "</span> + intent + <span class="string">" not ordered but result callback requested!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        userId = handleIncomingUser(callingPid, callingUid, userId,</span><br><span class="line">                <span class="keyword">true</span>, ALLOW_NON_FULL, <span class="string">"broadcast"</span>, callerPackage);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Make sure that the user who is receiving this broadcast is running.</span></span><br><span class="line">        <span class="comment">// If not, we will just skip it. Make an exception for shutdown broadcasts</span></span><br><span class="line">        <span class="comment">// and upgrade steps.</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (userId != UserHandle.USER_ALL &amp;&amp; !isUserRunningLocked(userId, <span class="keyword">false</span>)) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((callingUid != Process.SYSTEM_UID</span><br><span class="line">                    || (intent.getFlags() &amp; Intent.FLAG_RECEIVER_BOOT_UPGRADE) == <span class="number">0</span>)</span><br><span class="line">                    &amp;&amp; !Intent.ACTION_SHUTDOWN.equals(intent.getAction())) &#123;</span><br><span class="line">                Slog.w(TAG, <span class="string">"Skipping broadcast of "</span> + intent</span><br><span class="line">                        + <span class="string">": user "</span> + userId + <span class="string">" is stopped"</span>);</span><br><span class="line">                <span class="keyword">return</span> ActivityManager.BROADCAST_FAILED_USER_STOPPED;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">     <span class="comment">//2.deal with protection () uid,phoneid or isProtectedBroadcast(eg:screen on ,screen off )</span></span><br><span class="line">        BroadcastOptions brOptions = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (options != <span class="keyword">null</span>) &#123;</span><br><span class="line">            brOptions = <span class="keyword">new</span> BroadcastOptions(options);</span><br><span class="line">            <span class="keyword">if</span> (brOptions.getTemporaryAppWhitelistDuration() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// See if the caller is allowed to do this.  Note we are checking against</span></span><br><span class="line">                <span class="comment">// the actual real caller (not whoever provided the operation as say a</span></span><br><span class="line">                <span class="comment">// PendingIntent), because that who is actually supplied the arguments.</span></span><br><span class="line">                <span class="keyword">if</span> (checkComponentPermission(</span><br><span class="line">                        android.Manifest.permission.CHANGE_DEVICE_IDLE_TEMP_WHITELIST,</span><br><span class="line">                        Binder.getCallingPid(), Binder.getCallingUid(), -<span class="number">1</span>, <span class="keyword">true</span>)</span><br><span class="line">                        != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">                    String msg = <span class="string">"Permission Denial: "</span> + intent.getAction()</span><br><span class="line">                            + <span class="string">" broadcast from "</span> + callerPackage + <span class="string">" (pid="</span> + callingPid</span><br><span class="line">                            + <span class="string">", uid="</span> + callingUid + <span class="string">")"</span></span><br><span class="line">                            + <span class="string">" requires "</span></span><br><span class="line">                            + android.Manifest.permission.CHANGE_DEVICE_IDLE_TEMP_WHITELIST;</span><br><span class="line">                    Slog.w(TAG, msg);</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(msg);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * Prevent non-system code (defined here to be non-persistent</span></span><br><span class="line"><span class="comment">         * processes) from sending protected broadcasts.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">int</span> callingAppId = UserHandle.getAppId(callingUid);</span><br><span class="line">        <span class="keyword">if</span> (callingAppId == Process.SYSTEM_UID || callingAppId == Process.PHONE_UID</span><br><span class="line">            || callingAppId == Process.SHELL_UID || callingAppId == Process.BLUETOOTH_UID</span><br><span class="line">            || callingAppId == Process.NFC_UID || callingUid == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// Always okay.</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (callerApp == <span class="keyword">null</span> || !callerApp.persistent) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (AppGlobals.getPackageManager().isProtectedBroadcast(</span><br><span class="line">                        intent.getAction())) &#123;</span><br><span class="line">                    String msg = <span class="string">"Permission Denial: not allowed to send broadcast "</span></span><br><span class="line">                            + intent.getAction() + <span class="string">" from pid="</span></span><br><span class="line">                            + callingPid + <span class="string">", uid="</span> + callingUid;</span><br><span class="line">                    Slog.w(TAG, msg);</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(msg);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (AppWidgetManager.ACTION_APPWIDGET_CONFIGURE.equals(intent.getAction())) &#123;</span><br><span class="line">                    <span class="comment">// Special case for compatibility: we don't want apps to send this,</span></span><br><span class="line">                    <span class="comment">// but historically it has not been protected and apps may be using it</span></span><br><span class="line">                    <span class="comment">// to poke their own app widget.  So, instead of making it protected,</span></span><br><span class="line">                    <span class="comment">// just limit it to the caller.</span></span><br><span class="line">                    <span class="keyword">if</span> (callerApp == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        String msg = <span class="string">"Permission Denial: not allowed to send broadcast "</span></span><br><span class="line">                                + intent.getAction() + <span class="string">" from unknown caller."</span>;</span><br><span class="line">                        Slog.w(TAG, msg);</span><br><span class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(msg);</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (intent.getComponent() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="comment">// They are good enough to send to an explicit component...  verify</span></span><br><span class="line">                        <span class="comment">// it is being sent to the calling app.</span></span><br><span class="line">                        <span class="keyword">if</span> (!intent.getComponent().getPackageName().equals(</span><br><span class="line">                                callerApp.info.packageName)) &#123;</span><br><span class="line">                            String msg = <span class="string">"Permission Denial: not allowed to send broadcast "</span></span><br><span class="line">                                    + intent.getAction() + <span class="string">" to "</span></span><br><span class="line">                                    + intent.getComponent().getPackageName() + <span class="string">" from "</span></span><br><span class="line">                                    + callerApp.info.packageName;</span><br><span class="line">                            Slog.w(TAG, msg);</span><br><span class="line">                            <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(msg);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="comment">// Limit broadcast to their own package.</span></span><br><span class="line">                        intent.setPackage(callerApp.info.packageName);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                Slog.w(TAG, <span class="string">"Remote exception"</span>, e);</span><br><span class="line">                <span class="keyword">return</span> ActivityManager.BROADCAST_SUCCESS;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//3.deal with package BroadCast(eg: remove ,add etc.) and systerm BroadCast (eg:Intent.ACTION_TIMEZONE_CHANGED )</span></span><br><span class="line">        <span class="keyword">final</span> String action = intent.getAction();</span><br><span class="line">        <span class="keyword">if</span> (action != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">switch</span> (action) &#123;</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_UID_REMOVED:</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_PACKAGE_REMOVED:</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_PACKAGE_CHANGED:</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE:</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE:</span><br><span class="line">                    <span class="comment">// Handle special intents: if this broadcast is from the package</span></span><br><span class="line">                    <span class="comment">// manager about a package being removed, we need to remove all of</span></span><br><span class="line">                    <span class="comment">// its activities from the history stack.</span></span><br><span class="line">                    <span class="keyword">if</span> (checkComponentPermission(</span><br><span class="line">                            android.Manifest.permission.BROADCAST_PACKAGE_REMOVED,</span><br><span class="line">                            callingPid, callingUid, -<span class="number">1</span>, <span class="keyword">true</span>)</span><br><span class="line">                            != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">                        String msg = <span class="string">"Permission Denial: "</span> + intent.getAction()</span><br><span class="line">                                + <span class="string">" broadcast from "</span> + callerPackage + <span class="string">" (pid="</span> + callingPid</span><br><span class="line">                                + <span class="string">", uid="</span> + callingUid + <span class="string">")"</span></span><br><span class="line">                                + <span class="string">" requires "</span></span><br><span class="line">                                + android.Manifest.permission.BROADCAST_PACKAGE_REMOVED;</span><br><span class="line">                        Slog.w(TAG, msg);</span><br><span class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(msg);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">switch</span> (action) &#123;</span><br><span class="line">                        <span class="keyword">case</span> Intent.ACTION_UID_REMOVED:</span><br><span class="line">                            <span class="keyword">final</span> Bundle intentExtras = intent.getExtras();</span><br><span class="line">                            <span class="keyword">final</span> <span class="keyword">int</span> uid = intentExtras != <span class="keyword">null</span></span><br><span class="line">                                    ? intentExtras.getInt(Intent.EXTRA_UID) : -<span class="number">1</span>;</span><br><span class="line">                            <span class="keyword">if</span> (uid &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                                mBatteryStatsService.removeUid(uid);</span><br><span class="line">                                mAppOpsService.uidRemoved(uid);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE:</span><br><span class="line">                            <span class="comment">// If resources are unavailable just force stop all those packages</span></span><br><span class="line">                            <span class="comment">// and flush the attribute cache as well.</span></span><br><span class="line">                            String list[] =</span><br><span class="line">                                    intent.getStringArrayExtra(Intent.EXTRA_CHANGED_PACKAGE_LIST);</span><br><span class="line">                            <span class="keyword">if</span> (list != <span class="keyword">null</span> &amp;&amp; list.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.length; i++) &#123;</span><br><span class="line">                                    forceStopPackageLocked(list[i], -<span class="number">1</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">true</span>,</span><br><span class="line">                                            <span class="keyword">false</span>, <span class="keyword">false</span>, userId, <span class="string">"storage unmount"</span>);</span><br><span class="line">                                &#125;</span><br><span class="line">                                mRecentTasks.cleanupLocked(UserHandle.USER_ALL);</span><br><span class="line">                                sendPackageBroadcastLocked(</span><br><span class="line">                                        IApplicationThread.EXTERNAL_STORAGE_UNAVAILABLE, list,</span><br><span class="line">                                        userId);</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE:</span><br><span class="line">                            mRecentTasks.cleanupLocked(UserHandle.USER_ALL);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> Intent.ACTION_PACKAGE_REMOVED:</span><br><span class="line">                        <span class="keyword">case</span> Intent.ACTION_PACKAGE_CHANGED:</span><br><span class="line">                            Uri data = intent.getData();</span><br><span class="line">                            String ssp;</span><br><span class="line">                            <span class="keyword">if</span> (data != <span class="keyword">null</span> &amp;&amp; (ssp=data.getSchemeSpecificPart()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                                <span class="keyword">boolean</span> removed = Intent.ACTION_PACKAGE_REMOVED.equals(action);</span><br><span class="line">                                <span class="keyword">boolean</span> fullUninstall = removed &amp;&amp;</span><br><span class="line">                                        !intent.getBooleanExtra(Intent.EXTRA_REPLACING, <span class="keyword">false</span>);</span><br><span class="line">                                <span class="keyword">if</span> (!intent.getBooleanExtra(Intent.EXTRA_DONT_KILL_APP, <span class="keyword">false</span>)) &#123;</span><br><span class="line">                                    forceStopPackageLocked(ssp, UserHandle.getAppId(</span><br><span class="line">                                            intent.getIntExtra(Intent.EXTRA_UID, -<span class="number">1</span>)),</span><br><span class="line">                                            <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, fullUninstall, userId,</span><br><span class="line">                                            removed ? <span class="string">"pkg removed"</span> : <span class="string">"pkg changed"</span>);</span><br><span class="line">                                &#125;</span><br><span class="line">                                <span class="keyword">if</span> (removed) &#123;</span><br><span class="line">                                    sendPackageBroadcastLocked(IApplicationThread.PACKAGE_REMOVED,</span><br><span class="line">                                            <span class="keyword">new</span> String[] &#123;ssp&#125;, userId);</span><br><span class="line">                                    <span class="keyword">if</span> (fullUninstall) &#123;</span><br><span class="line">                                        mAppOpsService.packageRemoved(</span><br><span class="line">                                                intent.getIntExtra(Intent.EXTRA_UID, -<span class="number">1</span>), ssp);</span><br><span class="line"></span><br><span class="line">                                        <span class="comment">// Remove all permissions granted from/to this package</span></span><br><span class="line">                                        removeUriPermissionsForPackageLocked(ssp, userId, <span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">                                        removeTasksByPackageNameLocked(ssp, userId);</span><br><span class="line">                                        mBatteryStatsService.notePackageUninstalled(ssp);</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                                    cleanupDisabledPackageComponentsLocked(ssp, userId,</span><br><span class="line">                                            intent.getStringArrayExtra(</span><br><span class="line">                                                    Intent.EXTRA_CHANGED_COMPONENT_NAME_LIST));</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_PACKAGE_ADDED:</span><br><span class="line">                    <span class="comment">// Special case for adding a package: by default turn on compatibility mode.</span></span><br><span class="line">                    Uri data = intent.getData();</span><br><span class="line">                    String ssp;</span><br><span class="line">                    <span class="keyword">if</span> (data != <span class="keyword">null</span> &amp;&amp; (ssp = data.getSchemeSpecificPart()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">final</span> <span class="keyword">boolean</span> replacing =</span><br><span class="line">                                intent.getBooleanExtra(Intent.EXTRA_REPLACING, <span class="keyword">false</span>);</span><br><span class="line">                        mCompatModePackages.handlePackageAddedLocked(ssp, replacing);</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            ApplicationInfo ai = AppGlobals.getPackageManager().</span><br><span class="line">                                    getApplicationInfo(ssp, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">                            mBatteryStatsService.notePackageInstalled(ssp,</span><br><span class="line">                                    ai != <span class="keyword">null</span> ? ai.versionCode : <span class="number">0</span>);</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_TIMEZONE_CHANGED:</span><br><span class="line">                    <span class="comment">// If this is the time zone changed action, queue up a message that will reset</span></span><br><span class="line">                    <span class="comment">// the timezone of all currently running processes. This message will get</span></span><br><span class="line">                    <span class="comment">// queued up before the broadcast happens.</span></span><br><span class="line">                    mHandler.sendEmptyMessage(UPDATE_TIME_ZONE);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_TIME_CHANGED:</span><br><span class="line">                    <span class="comment">// If the user set the time, let all running processes know.</span></span><br><span class="line">                    <span class="keyword">final</span> <span class="keyword">int</span> is24Hour =</span><br><span class="line">                            intent.getBooleanExtra(Intent.EXTRA_TIME_PREF_24_HOUR_FORMAT, <span class="keyword">false</span>) ? <span class="number">1</span></span><br><span class="line">                                    : <span class="number">0</span>;</span><br><span class="line">                    mHandler.sendMessage(mHandler.obtainMessage(UPDATE_TIME, is24Hour, <span class="number">0</span>));</span><br><span class="line">                    BatteryStatsImpl stats = mBatteryStatsService.getActiveStatistics();</span><br><span class="line">                    <span class="keyword">synchronized</span> (stats) &#123;</span><br><span class="line">                        stats.noteCurrentTimeChangedLocked();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> Intent.ACTION_CLEAR_DNS_CACHE:</span><br><span class="line">                    mHandler.sendEmptyMessage(CLEAR_DNS_CACHE_MSG);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> Proxy.PROXY_CHANGE_ACTION:</span><br><span class="line">                    ProxyInfo proxy = intent.getParcelableExtra(Proxy.EXTRA_PROXY_INFO);</span><br><span class="line">                    mHandler.sendMessage(mHandler.obtainMessage(UPDATE_HTTP_PROXY_MSG, proxy));</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Add to the sticky list if requested.</span></span><br><span class="line">      <span class="comment">//4.update stick broadcast.record the broadcast if it is not start</span></span><br><span class="line">       <span class="comment">//.......</span></span><br><span class="line">        <span class="keyword">int</span>[] users;</span><br><span class="line">        <span class="keyword">if</span> (userId == UserHandle.USER_ALL) &#123;</span><br><span class="line">            <span class="comment">// Caller wants broadcast to go to all started users.</span></span><br><span class="line">            users = mStartedUserArray;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Caller wants broadcast to go to one specific user.</span></span><br><span class="line">            users = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123;userId&#125;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Figure out who all will receive this broadcast.</span></span><br><span class="line">        List receivers = <span class="keyword">null</span>;</span><br><span class="line">        List&lt;BroadcastFilter&gt; registeredReceivers = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">// Need to resolve the intent to interested receivers...</span></span><br><span class="line">        <span class="keyword">if</span> ((intent.getFlags()&amp;Intent.FLAG_RECEIVER_REGISTERED_ONLY)</span><br><span class="line">                 == <span class="number">0</span>) &#123;</span><br><span class="line">            receivers = collectReceiverComponents(intent, resolvedType, callingUid, users);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (intent.getComponent() == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (userId == UserHandle.USER_ALL &amp;&amp; callingUid == Process.SHELL_UID) &#123;</span><br><span class="line">                <span class="comment">// Query one target user at a time, excluding shell-restricted users</span></span><br><span class="line">                UserManagerService ums = getUserManagerLocked();</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; users.length; i++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (ums.hasUserRestriction(</span><br><span class="line">                            UserManager.DISALLOW_DEBUGGING_FEATURES, users[i])) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    List&lt;BroadcastFilter&gt; registeredReceiversForUser =</span><br><span class="line">                            mReceiverResolver.queryIntent(intent,</span><br><span class="line">                                    resolvedType, <span class="keyword">false</span>, users[i]);</span><br><span class="line">                    <span class="keyword">if</span> (registeredReceivers == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        registeredReceivers = registeredReceiversForUser;</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (registeredReceiversForUser != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        registeredReceivers.addAll(registeredReceiversForUser);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                registeredReceivers = mReceiverResolver.queryIntent(intent,</span><br><span class="line">                        resolvedType, <span class="keyword">false</span>, userId);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//5.delivery to broadcasteQueue</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> replacePending =</span><br><span class="line">                (intent.getFlags()&amp;Intent.FLAG_RECEIVER_REPLACE_PENDING) != <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (DEBUG_BROADCAST) Slog.v(TAG_BROADCAST, <span class="string">"Enqueing broadcast: "</span> + intent.getAction()</span><br><span class="line">                + <span class="string">" replacePending="</span> + replacePending);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> NR = registeredReceivers != <span class="keyword">null</span> ? registeredReceivers.size() : <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (!ordered &amp;&amp; NR &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// If we are not serializing this broadcast, then send the</span></span><br><span class="line">            <span class="comment">// registered receivers separately so they don't wait for the</span></span><br><span class="line">            <span class="comment">// components to be launched.</span></span><br><span class="line">            <span class="keyword">final</span> BroadcastQueue queue = broadcastQueueForIntent(intent);</span><br><span class="line">            BroadcastRecord r = <span class="keyword">new</span> BroadcastRecord(queue, intent, callerApp,</span><br><span class="line">                    callerPackage, callingPid, callingUid, resolvedType, requiredPermissions,</span><br><span class="line">                    appOp, brOptions, registeredReceivers, resultTo, resultCode, resultData,</span><br><span class="line">                    resultExtras, ordered, sticky, <span class="keyword">false</span>, userId);</span><br><span class="line">            <span class="keyword">if</span> (DEBUG_BROADCAST) Slog.v(TAG_BROADCAST, <span class="string">"Enqueueing parallel broadcast "</span> + r);</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">boolean</span> replaced = replacePending &amp;&amp; queue.replaceParallelBroadcastLocked(r);</span><br><span class="line">            <span class="keyword">if</span> (!replaced) &#123;</span><br><span class="line">                queue.enqueueParallelBroadcastLocked(r);<span class="comment">// insert has native iiReceiverDispatch .</span></span><br><span class="line">                queue.scheduleBroadcastsLocked(); <span class="comment">//</span></span><br><span class="line">            &#125;</span><br><span class="line">            registeredReceivers = <span class="keyword">null</span>;</span><br><span class="line">            NR = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">//......</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ActivityManager.BROADCAST_SUCCESS;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="performReceiveLocked"><a href="#performReceiveLocked" class="headerlink" title="performReceiveLocked"></a>performReceiveLocked</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">1. ActivityThread'ApplicationThread to wrok for the result</span></span><br><span class="line"><span class="comment">2. LoadApk.ReceiverDispatcher to wrok for the result</span></span><br><span class="line"><span class="comment">**/</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">performReceiveLocked</span><span class="params">(ProcessRecord app, IIntentReceiver receiver,</span></span></span><br><span class="line"><span class="function"><span class="params">            Intent intent, <span class="keyword">int</span> resultCode, String data, Bundle extras,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> ordered, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> sendingUser)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        <span class="comment">// Send the intent to the receiver asynchronously using one-way binder calls.</span></span><br><span class="line">        <span class="keyword">if</span> (app != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (app.thread != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// If we have an app thread, do the call through that so it is</span></span><br><span class="line">                <span class="comment">// correctly ordered with other one-way calls.</span></span><br><span class="line">                app.thread.scheduleRegisteredReceiver(receiver, intent, resultCode,</span><br><span class="line">                        data, extras, ordered, sticky, sendingUser, app.repProcState);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// Application has died. Receiver doesn't exist.</span></span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RemoteException(<span class="string">"app.thread must not be null"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            receiver.performReceive(intent, resultCode, data, extras, ordered,</span><br><span class="line">                    sticky, sendingUser);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="LoadApk-ReceiverDispatcher-performReceive"><a href="#LoadApk-ReceiverDispatcher-performReceive" class="headerlink" title="LoadApk.ReceiverDispatcher:performReceive"></a>LoadApk.ReceiverDispatcher:performReceive</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">performReceive</span><span class="params">(Intent intent, <span class="keyword">int</span> resultCode, String data,</span></span></span><br><span class="line"><span class="function"><span class="params">        Bundle extras, <span class="keyword">boolean</span> ordered, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> sendingUser)</span> </span>&#123;</span><br><span class="line">    LoadedApk.ReceiverDispatcher rd = mDispatcher.get();</span><br><span class="line">    <span class="keyword">if</span> (ActivityThread.DEBUG_BROADCAST) &#123;</span><br><span class="line">        <span class="keyword">int</span> seq = intent.getIntExtra(<span class="string">"seq"</span>, -<span class="number">1</span>);</span><br><span class="line">        Slog.i(ActivityThread.TAG, <span class="string">"Receiving broadcast "</span> + intent.getAction() + <span class="string">" seq="</span> + seq</span><br><span class="line">                + <span class="string">" to "</span> + (rd != <span class="keyword">null</span> ? rd.mReceiver : <span class="keyword">null</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (rd != <span class="keyword">null</span>) &#123;</span><br><span class="line">        rd.performReceive(intent, resultCode, data, extras,</span><br><span class="line">                ordered, sticky, sendingUser);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// The activity manager dispatched a broadcast to a registered</span></span><br><span class="line">        <span class="comment">// receiver in this process, but before it could be delivered the</span></span><br><span class="line">        <span class="comment">// receiver was unregistered.  Acknowledge the broadcast on its</span></span><br><span class="line">        <span class="comment">// behalf so that the system's broadcast sequence can continue.</span></span><br><span class="line">        <span class="keyword">if</span> (ActivityThread.DEBUG_BROADCAST) Slog.i(ActivityThread.TAG,</span><br><span class="line">                <span class="string">"Finishing broadcast to unregistered receiver"</span>);</span><br><span class="line">        IActivityManager mgr = ActivityManagerNative.getDefault();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (extras != <span class="keyword">null</span>) &#123;</span><br><span class="line">                extras.setAllowFds(<span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            mgr.finishReceiver(<span class="keyword">this</span>, resultCode, data, extras, <span class="keyword">false</span>, intent.getFlags());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">            Slog.w(ActivityThread.TAG, <span class="string">"Couldn't finish broadcast to unregistered receiver"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="LoadApk-ReceiverDispatcher-Args-run"><a href="#LoadApk-ReceiverDispatcher-Args-run" class="headerlink" title="LoadApk.ReceiverDispatcher.Args:run"></a>LoadApk.ReceiverDispatcher.Args:run</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> BroadcastReceiver receiver = mReceiver;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> ordered = mOrdered;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (ActivityThread.DEBUG_BROADCAST) &#123;</span><br><span class="line">            <span class="keyword">int</span> seq = mCurIntent.getIntExtra(<span class="string">"seq"</span>, -<span class="number">1</span>);</span><br><span class="line">            Slog.i(ActivityThread.TAG, <span class="string">"Dispatching broadcast "</span> + mCurIntent.getAction()</span><br><span class="line">                    + <span class="string">" seq="</span> + seq + <span class="string">" to "</span> + mReceiver);</span><br><span class="line">            Slog.i(ActivityThread.TAG, <span class="string">"  mRegistered="</span> + mRegistered</span><br><span class="line">                    + <span class="string">" mOrderedHint="</span> + ordered);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">final</span> IActivityManager mgr = ActivityManagerNative.getDefault();</span><br><span class="line">        <span class="keyword">final</span> Intent intent = mCurIntent;</span><br><span class="line">        mCurIntent = <span class="keyword">null</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (receiver == <span class="keyword">null</span> || mForgotten) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mRegistered &amp;&amp; ordered) &#123;</span><br><span class="line">                <span class="keyword">if</span> (ActivityThread.DEBUG_BROADCAST) Slog.i(ActivityThread.TAG,</span><br><span class="line">                        <span class="string">"Finishing null broadcast to "</span> + mReceiver);</span><br><span class="line">                sendFinished(mgr);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, <span class="string">"broadcastReceiveReg"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ClassLoader cl =  mReceiver.getClass().getClassLoader();</span><br><span class="line">            intent.setExtrasClassLoader(cl);</span><br><span class="line">            setExtrasClassLoader(cl);</span><br><span class="line">            receiver.setPendingResult(<span class="keyword">this</span>);</span><br><span class="line">            receiver.onReceive(mContext, intent);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mRegistered &amp;&amp; ordered) &#123;</span><br><span class="line">                <span class="keyword">if</span> (ActivityThread.DEBUG_BROADCAST) Slog.i(ActivityThread.TAG,</span><br><span class="line">                        <span class="string">"Finishing failed broadcast to "</span> + mReceiver);</span><br><span class="line">                sendFinished(mgr);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (mInstrumentation == <span class="keyword">null</span> ||</span><br><span class="line">                    !mInstrumentation.onException(mReceiver, e)) &#123;</span><br><span class="line">                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                    <span class="string">"Error receiving broadcast "</span> + intent</span><br><span class="line">                    + <span class="string">" in "</span> + mReceiver, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (receiver.getPendingResult() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            finish();</span><br><span class="line">        &#125;</span><br><span class="line">        Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="安全校验"><a href="#安全校验" class="headerlink" title="安全校验"></a>安全校验</h2><h3 id="等级"><a href="#等级" class="headerlink" title="等级"></a>等级</h3><p>uid = userId * 100000  + appId</p>
+<p>uid//进程功能的一种标识</p>
+<h4 id="ID的区间"><a href="#ID的区间" class="headerlink" title="ID的区间"></a>ID的区间</h4><h5 id="uid"><a href="#uid" class="headerlink" title="uid"></a>uid</h5><p>有root, system,radio,media等都属于系统uid定义在在Process.java文件，如下：</p>
+<table>
+<thead>
+<tr>
+<th>uid</th>
+<th>值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ROOT_UID</td>
+<td>0</td>
+<td>root uid</td>
+</tr>
+<tr>
+<td>SYSTEM_UID</td>
+<td>1000</td>
+<td>用于systemserver进程</td>
+</tr>
+<tr>
+<td>PHONE_UID</td>
+<td>1001</td>
+<td>telephony所属的uid</td>
+</tr>
+<tr>
+<td>BLUETOOTH_UID</td>
+<td>1002</td>
+<td>蓝牙所属的uid</td>
+</tr>
+<tr>
+<td>LOG_UID</td>
+<td>1007</td>
+<td>log所属的uid</td>
+</tr>
+<tr>
+<td>WIFI_UID</td>
+<td>1008</td>
+<td></td>
+</tr>
+<tr>
+<td>MEDIA_UID</td>
+<td>1013</td>
+<td>用于mediaserver进程</td>
+</tr>
+<tr>
+<td>VPN_UID</td>
+<td>1016</td>
+<td></td>
+</tr>
+<tr>
+<td>DRM_UID</td>
+<td>1019</td>
+<td></td>
+</tr>
+<tr>
+<td>MEDIA_RW_GID</td>
+<td>1023</td>
+<td>具有写内部媒体存储权限的uid</td>
+</tr>
+<tr>
+<td>……</td>
+<td>……</td>
+<td>……..</td>
+</tr>
+</tbody>
+</table>
+<p>对于非systerm的uid会进行权限的检查</p>
+<h5 id="userId"><a href="#userId" class="headerlink" title="userId"></a>userId</h5><table>
+<thead>
+<tr>
+<th>userId</th>
+<th>赋值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>USER_OWNER</td>
+<td>0</td>
+<td>拥有者</td>
+</tr>
+<tr>
+<td>USER_ALL</td>
+<td>-1</td>
+<td>所有用户</td>
+</tr>
+<tr>
+<td>USER_CURRENT</td>
+<td>-2</td>
+<td>当前活动用户</td>
+</tr>
+<tr>
+<td>USER_CURRENT_OR_SELF</td>
+<td>-3</td>
+<td>当前用户或者调用者所在用户</td>
+</tr>
+<tr>
+<td>USER_NULL</td>
+<td>-1000</td>
+<td>未定义用户</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//reference code      </span></span><br><span class="line"><span class="keyword">if</span> (!allow) &#123;</span><br><span class="line">                <span class="keyword">if</span> (userId == UserHandle.USER_CURRENT_OR_SELF) &#123;</span><br><span class="line">                    <span class="comment">// In this case, they would like to just execute as their</span></span><br><span class="line">                    <span class="comment">// owner user instead of failing.</span></span><br><span class="line">                    targetUserId = callingUserId;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">//......</span></span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(msg);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="appId"><a href="#appId" class="headerlink" title="appId"></a>appId</h5><ul>
+<li>system appid: [1000, 9999]</li>
+<li>application appid:[10000, 19999]</li>
+<li>Shared AppGid: [50000, 59999]</li>
+<li>isolated appid: [99000, 99999]</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//reference code</span></span><br><span class="line"><span class="keyword">int</span> callingAppId = UserHandle.getAppId(callingUid);</span><br><span class="line">       <span class="keyword">if</span> (callingAppId == Process.SYSTEM_UID || callingAppId == Process.PHONE_UID</span><br><span class="line">           || callingAppId == Process.SHELL_UID || callingAppId == Process.BLUETOOTH_UID</span><br><span class="line">           || callingAppId == Process.NFC_UID || callingUid == <span class="number">0</span>) &#123;</span><br><span class="line">           <span class="comment">// Always okay.</span></span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> &#123;</span><br><span class="line">           <span class="comment">//.......</span></span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h3><h4 id="发送广播-1"><a href="#发送广播-1" class="headerlink" title="发送广播"></a>发送广播</h4><ul>
+<li>intentfilter进行一部分广播的过滤</li>
+<li>sendBroadcast(Intent, String)的接口在发送广播时指定接收者必须具备的permission</li>
+<li>通过Intent.setPackage设置广播仅对某个程序有效</li>
+<li>protectionLevel 可以设置到签名等级，防止反编译后被第三方应用模拟相同的权限</li>
+</ul>
+<h4 id="注册广播-1"><a href="#注册广播-1" class="headerlink" title="注册广播"></a>注册广播</h4><ul>
+<li>registerReceiver(BroadcastReceiver, IntentFilter, String, android.os.Handler)的接口指定发送者必须具备的permission</li>
+<li>对于静态注册的广播可以通过android:exported=”false”属性表示接收者对外部应用程序不可用</li>
+<li>protectionLevel可以设置到签名等级，防止反编译后被第三方应用模拟相同的权限</li>
+</ul>
+<h2 id="开源框架-EventBus"><a href="#开源框架-EventBus" class="headerlink" title="开源框架 EventBus"></a>开源框架 EventBus</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h4 id="广播的缺点"><a href="#广播的缺点" class="headerlink" title="广播的缺点"></a>广播的缺点</h4><ul>
+<li><p>它是重量级的，费时的一种方式；</p>
+</li>
+<li><p>可以接受各种系统的通知包括电量变化，系统设置，短信等等，所以就决定了它需要基于android的</p>
+<p>sdk，而且它支持跨进程通信，决定了它必须通过AMS做一次judge.</p>
+</li>
+</ul>
+<h4 id="EventBus的优点"><a href="#EventBus的优点" class="headerlink" title="EventBus的优点"></a>EventBus的优点</h4><ul>
+<li>它是轻量，快速的一种方式；</li>
+<li>使用简单。register注册,post发送,onEvent进行事件的处理；</li>
+<li>提供了观察者所没有的粘滞,优先级的处理逻辑,对齐了broadcastRecevicer;</li>
+</ul>
+<h3 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h3><p><img src="/images/BroadCaster_EventBus.png" alt="EventBus"></p>
+<h3 id="流程步骤"><a href="#流程步骤" class="headerlink" title="流程步骤"></a>流程步骤</h3><h4 id="注册与注销"><a href="#注册与注销" class="headerlink" title="注册与注销"></a>注册与注销</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>.param</span><br><span class="line">key:消息类型(注册类和回调方法) or 注册类(消息类型)</span><br><span class="line">  Map&lt;Class&lt;?&gt;, CopyOnWriteArrayList&lt;Subscription&gt;&gt; subscriptionsByEventType;<span class="comment">//根据消息类型找(类，方法)</span></span><br><span class="line">Map&lt;Object, List&lt;Class&lt;?&gt;&gt;&gt; typesBySubscriber;<span class="comment">//根据类找消息类型</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">2</span>.register:</span><br><span class="line"><span class="number">2.1</span></span><br><span class="line">  <span class="comment">//类－&gt;方法-&gt;消息类型 store in subscriptionsByEventType</span></span><br><span class="line">subscriptionsByEventType.put(eventType, subscriptions);<span class="comment">//eg:subscriptionsByEventType.put(MessageEvent ,new Subscriptions(activity,@method))</span></span><br><span class="line"></span><br><span class="line"><span class="number">2.2</span></span><br><span class="line">  <span class="comment">//类，消息类型 store in typesBySubscriber</span></span><br><span class="line"> typesBySubscriber.put(subscriber,  subscribedEvents);<span class="comment">//eg:typesBySubscriber.put(activity,MessageEvent)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">3</span>.unregister:</span><br><span class="line"><span class="number">3.1</span></span><br><span class="line">  <span class="comment">//类-&gt;消息类型 delete from subscriptionsByEventType</span></span><br><span class="line"><span class="number">3.2</span></span><br><span class="line">  <span class="comment">//类 delete from typesBySubscriber</span></span><br></pre></td></tr></table></figure>
+<h4 id="发送"><a href="#发送" class="headerlink" title="发送"></a>发送</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">post(Object event)</span><br><span class="line">[</span><br><span class="line">  eventQueue.add(event)</span><br><span class="line">  <span class="keyword">while</span> (!eventQueue.isEmpty()) </span><br><span class="line">]-&gt;</span><br><span class="line">postSingleEvent()-&gt;</span><br><span class="line">postSingleEventForEventType()-&gt;</span><br><span class="line">postToSubscription</span><br><span class="line">[</span><br><span class="line">Poster.equeue() <span class="comment">//async,background,main...... </span></span><br><span class="line">PendingPost.obtainPendingPost</span><br><span class="line">eventBus.getExecutorService().execute()       </span><br><span class="line">eventBus.invokeSubscriber</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h3 id="优先级与粘滞消息的处理"><a href="#优先级与粘滞消息的处理" class="headerlink" title="优先级与粘滞消息的处理"></a>优先级与粘滞消息的处理</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2017/11/11/Broadcaster源码解读/" title="Broadcaster源码解读">http://jinjian.info/2017/11/11/Broadcaster源码解读/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RTFSC-Read-the-fucking-source-code/" rel="tag"># RTFSC (Read the fucking source code )</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/05/ImageView源码解读/" rel="next" title="ImageView源码解读">
+                <i class="fa fa-chevron-left"></i> ImageView源码解读
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/18/statusBar源码解读/" rel="prev" title="StatusBar源码解读">
+                StatusBar源码解读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#注册广播"><span class="nav-number">1.</span> <span class="nav-text">注册广播</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态注册"><span class="nav-number">1.1.</span> <span class="nav-text">动态注册</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#时序图"><span class="nav-number">1.1.1.</span> <span class="nav-text">时序图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#广播的存储"><span class="nav-number">1.1.2.</span> <span class="nav-text">广播的存储</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#静态注册"><span class="nav-number">1.2.</span> <span class="nav-text">静态注册</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发送广播"><span class="nav-number">2.</span> <span class="nav-text">发送广播</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#路径"><span class="nav-number">2.1.</span> <span class="nav-text">路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#broadcastIntent"><span class="nav-number">2.2.</span> <span class="nav-text">broadcastIntent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#broadcastIntentLocked"><span class="nav-number">2.3.</span> <span class="nav-text">broadcastIntentLocked</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#performReceiveLocked"><span class="nav-number">2.4.</span> <span class="nav-text">performReceiveLocked</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoadApk-ReceiverDispatcher-performReceive"><span class="nav-number">2.5.</span> <span class="nav-text">LoadApk.ReceiverDispatcher:performReceive</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoadApk-ReceiverDispatcher-Args-run"><span class="nav-number">2.6.</span> <span class="nav-text">LoadApk.ReceiverDispatcher.Args:run</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全校验"><span class="nav-number">3.</span> <span class="nav-text">安全校验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#等级"><span class="nav-number">3.1.</span> <span class="nav-text">等级</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ID的区间"><span class="nav-number">3.1.1.</span> <span class="nav-text">ID的区间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#uid"><span class="nav-number">3.1.1.1.</span> <span class="nav-text">uid</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#userId"><span class="nav-number">3.1.1.2.</span> <span class="nav-text">userId</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#appId"><span class="nav-number">3.1.1.3.</span> <span class="nav-text">appId</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限"><span class="nav-number">3.2.</span> <span class="nav-text">权限</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#发送广播-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">发送广播</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注册广播-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">注册广播</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开源框架-EventBus"><span class="nav-number">4.</span> <span class="nav-text">开源框架 EventBus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">4.1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#广播的缺点"><span class="nav-number">4.1.1.</span> <span class="nav-text">广播的缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EventBus的优点"><span class="nav-number">4.1.2.</span> <span class="nav-text">EventBus的优点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#架构图"><span class="nav-number">4.2.</span> <span class="nav-text">架构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流程步骤"><span class="nav-number">4.3.</span> <span class="nav-text">流程步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#注册与注销"><span class="nav-number">4.3.1.</span> <span class="nav-text">注册与注销</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送"><span class="nav-number">4.3.2.</span> <span class="nav-text">发送</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优先级与粘滞消息的处理"><span class="nav-number">4.4.</span> <span class="nav-text">优先级与粘滞消息的处理</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

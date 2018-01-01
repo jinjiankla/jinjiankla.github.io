@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="RTFSC (Read the fucking source code )," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire 2.0" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="QusetionsHow setScaleType？setScaleType in conjunction with setFrame setScaleType123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646">
+<meta name="keywords" content="RTFSC (Read the fucking source code )">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ImageView源码解读">
+<meta property="og:url" content="http://jinjian.info/2017/11/05/ImageView源码解读/index.html">
+<meta property="og:site_name" content="Desire 2.0">
+<meta property="og:description" content="QusetionsHow setScaleType？setScaleType in conjunction with setFrame setScaleType123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-23T17:50:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ImageView源码解读">
+<meta name="twitter:description" content="QusetionsHow setScaleType？setScaleType in conjunction with setFrame setScaleType123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2017/11/05/ImageView源码解读/"/>
+
+
+
+
+
+  <title>ImageView源码解读 | Desire 2.0</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire 2.0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2017/11/05/ImageView源码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire 2.0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ImageView源码解读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-05T00:00:00+08:00">
+                2017-11-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读别人的源码，涨自己的智慧/" itemprop="url" rel="index">
+                    <span itemprop="name">读别人的源码，涨自己的智慧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,778字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Qusetions"><a href="#Qusetions" class="headerlink" title="Qusetions"></a>Qusetions</h2><h3 id="How-setScaleType？"><a href="#How-setScaleType？" class="headerlink" title="How setScaleType？"></a>How setScaleType？</h3><p>setScaleType in conjunction with setFrame</p>
+<h4 id="setScaleType"><a href="#setScaleType" class="headerlink" title="setScaleType"></a>setScaleType</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Controls how the image should be resized or moved to match the size</span></span><br><span class="line"><span class="comment"> * of this ImageView.</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> scaleType The desired scaling mode.</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@attr</span> ref android.R.styleable#ImageView_scaleType</span></span><br><span class="line"><span class="comment"> * normal step</span></span><br><span class="line"><span class="comment"> * 1.store mScaleType</span></span><br><span class="line"><span class="comment"> * 2.setWillNotCacheDrawing//how to work this method</span></span><br><span class="line"><span class="comment">    /##</span></span><br><span class="line"><span class="comment">    v.setDrawingCacheEnabled(true);</span></span><br><span class="line"><span class="comment">    v.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),</span></span><br><span class="line"><span class="comment">    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));//this is the important code</span></span><br><span class="line"><span class="comment">    Without it the view will have a dimension of 0,0 and the bitmap will be null</span></span><br><span class="line"><span class="comment">    v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());</span></span><br><span class="line"><span class="comment">    v.buildDrawingCache(true);</span></span><br><span class="line"><span class="comment">    Bitmap b = Bitmap.createBitmap(v.getDrawingCache());</span></span><br><span class="line"><span class="comment">    v.setDrawingCacheEnabled(false); // clear drawing cache</span></span><br><span class="line"><span class="comment">    ##/</span></span><br><span class="line"><span class="comment">   <span class="doctag">@seeNext</span> View.draw()-&gt;View.getDrawingCache()</span></span><br><span class="line"><span class="comment">   <span class="doctag">@seeNext</span> View.buildDrawingCacheImpl()</span></span><br><span class="line"><span class="comment"> * 3.requestLayout and invalidate</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setScaleType</span><span class="params">(ScaleType scaleType)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (scaleType == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mScaleType != scaleType) &#123;</span><br><span class="line">        mScaleType = scaleType;</span><br><span class="line"></span><br><span class="line">        setWillNotCacheDrawing(mScaleType == ScaleType.CENTER);            </span><br><span class="line"></span><br><span class="line">        requestLayout();</span><br><span class="line">        invalidate();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * This method is called by ViewGroup.drawChild() to have each child view draw itself.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This is where the View specializes rendering behavior based on layer type,</span></span><br><span class="line"><span class="comment"> * and hardware acceleration.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">draw</span><span class="params">(Canvas canvas, ViewGroup parent, <span class="keyword">long</span> drawingTime)</span> </span>&#123;</span><br><span class="line">   ......</span><br><span class="line">    Bitmap cache = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">int</span> layerType = getLayerType(); <span class="comment">// <span class="doctag">TODO:</span> signify cache state with just 'cache' local</span></span><br><span class="line">    <span class="keyword">if</span> (layerType == LAYER_TYPE_SOFTWARE</span><br><span class="line">            || (!drawingWithRenderNode &amp;&amp; layerType != LAYER_TYPE_NONE)) &#123;</span><br><span class="line">        <span class="comment">// If not drawing with RenderNode, treat HW layers as SW</span></span><br><span class="line">        layerType = LAYER_TYPE_SOFTWARE;</span><br><span class="line">        buildDrawingCache(<span class="keyword">true</span>);</span><br><span class="line">        cache = getDrawingCache(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!drawingWithDrawingCache) &#123;</span><br><span class="line">    ......</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cache != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mPrivateFlags &amp;= ~PFLAG_DIRTY_MASK;</span><br><span class="line">        <span class="keyword">if</span> (layerType == LAYER_TYPE_NONE) &#123;</span><br><span class="line">            <span class="comment">// no layer paint, use temporary paint to draw bitmap</span></span><br><span class="line">            Paint cachePaint = parent.mCachePaint;</span><br><span class="line">            <span class="keyword">if</span> (cachePaint == <span class="keyword">null</span>) &#123;</span><br><span class="line">                cachePaint = <span class="keyword">new</span> Paint();</span><br><span class="line">                cachePaint.setDither(<span class="keyword">false</span>);</span><br><span class="line">                parent.mCachePaint = cachePaint;</span><br><span class="line">            &#125;</span><br><span class="line">            cachePaint.setAlpha((<span class="keyword">int</span>) (alpha * <span class="number">255</span>));</span><br><span class="line">            canvas.drawBitmap(cache, <span class="number">0.0f</span>, <span class="number">0.0f</span>, cachePaint);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// use layer paint to draw the bitmap, merging the two alphas, but also restore</span></span><br><span class="line">            <span class="keyword">int</span> layerPaintAlpha = mLayerPaint.getAlpha();</span><br><span class="line">            mLayerPaint.setAlpha((<span class="keyword">int</span>) (alpha * layerPaintAlpha));</span><br><span class="line">            canvas.drawBitmap(cache, <span class="number">0.0f</span>, <span class="number">0.0f</span>, mLayerPaint);</span><br><span class="line">            mLayerPaint.setAlpha(layerPaintAlpha);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Returns the bitmap in which this view drawing is cached. The returned bitmap</span></span><br><span class="line"><span class="comment"> * is null when caching is disabled. If caching is enabled and the cache is not ready,</span></span><br><span class="line"><span class="comment"> * this method will create it. Calling &#123;<span class="doctag">@link</span> #draw(android.graphics.Canvas)&#125; will not</span></span><br><span class="line"><span class="comment"> * draw from the cache when the cache is enabled. To benefit from the cache, you must</span></span><br><span class="line"><span class="comment"> * request the drawing cache by calling this method and draw it on screen if the</span></span><br><span class="line"><span class="comment"> * returned bitmap is not null.&lt;/p&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Note about auto scaling in compatibility mode: When auto scaling is not enabled,</span></span><br><span class="line"><span class="comment"> * this method will create a bitmap of the same size as this view. Because this bitmap</span></span><br><span class="line"><span class="comment"> * will be drawn scaled by the parent ViewGroup, the result on screen might show</span></span><br><span class="line"><span class="comment"> * scaling artifacts. To avoid such artifacts, you should call this method by setting</span></span><br><span class="line"><span class="comment"> * the auto scaling to true. Doing so, however, will generate a bitmap of a different</span></span><br><span class="line"><span class="comment"> * size than the view. This implies that your application must be able to handle this</span></span><br><span class="line"><span class="comment"> * size.&lt;/p&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> autoScale Indicates whether the generated bitmap should be scaled based on</span></span><br><span class="line"><span class="comment"> *        the current density of the screen when the application is in compatibility</span></span><br><span class="line"><span class="comment"> *        mode.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> A bitmap representing this view or null if cache is disabled.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #setDrawingCacheEnabled(boolean)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #isDrawingCacheEnabled()</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #buildDrawingCache(boolean)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #destroyDrawingCache()</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Bitmap <span class="title">getDrawingCache</span><span class="params">(<span class="keyword">boolean</span> autoScale)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//setScaleType funtion here</span></span><br><span class="line">    <span class="keyword">if</span> ((mViewFlags &amp; WILL_NOT_CACHE_DRAWING) == WILL_NOT_CACHE_DRAWING) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ((mViewFlags &amp; DRAWING_CACHE_ENABLED) == DRAWING_CACHE_ENABLED) &#123;</span><br><span class="line">        buildDrawingCache(autoScale);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> autoScale ? mDrawingCache : mUnscaledDrawingCache;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment"> * private, internal implementation of buildDrawingCache, used to enable tracing</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">buildDrawingCacheImpl</span><span class="params">(<span class="keyword">boolean</span> autoScale)</span> </span>&#123;</span><br><span class="line">    mCachingFailed = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> width = mRight - mLeft;</span><br><span class="line">    <span class="keyword">int</span> height = mBottom - mTop;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> AttachInfo attachInfo = mAttachInfo;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> scalingRequired = attachInfo != <span class="keyword">null</span> &amp;&amp; attachInfo.mScalingRequired;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (autoScale &amp;&amp; scalingRequired) &#123;</span><br><span class="line">        width = (<span class="keyword">int</span>) ((width * attachInfo.mApplicationScale) + <span class="number">0.5f</span>);</span><br><span class="line">        height = (<span class="keyword">int</span>) ((height * attachInfo.mApplicationScale) + <span class="number">0.5f</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> drawingCacheBackgroundColor = mDrawingCacheBackgroundColor;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> opaque = drawingCacheBackgroundColor != <span class="number">0</span> || isOpaque();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> use32BitCache = attachInfo != <span class="keyword">null</span> &amp;&amp; attachInfo.mUse32BitDrawingCache;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> projectedBitmapSize = width * height * (opaque &amp;&amp; !use32BitCache ? <span class="number">2</span> : <span class="number">4</span>);</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> drawingCacheSize =</span><br><span class="line">            ViewConfiguration.get(mContext).getScaledMaximumDrawingCacheSize();</span><br><span class="line">    <span class="keyword">if</span> (width &lt;= <span class="number">0</span> || height &lt;= <span class="number">0</span> || projectedBitmapSize &gt; drawingCacheSize) &#123;</span><br><span class="line">        <span class="keyword">if</span> (width &gt; <span class="number">0</span> &amp;&amp; height &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Log.w(VIEW_LOG_TAG, getClass().getSimpleName() + <span class="string">" not displayed because it is"</span></span><br><span class="line">                    + <span class="string">" too large to fit into a software layer (or drawing cache), needs "</span></span><br><span class="line">                    + projectedBitmapSize + <span class="string">" bytes, only "</span></span><br><span class="line">                    + drawingCacheSize + <span class="string">" available"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        destroyDrawingCache();</span><br><span class="line">        mCachingFailed = <span class="keyword">true</span>;</span><br><span class="line">      <span class="comment">// if view is not Measured ,return here</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="setFrame"><a href="#setFrame" class="headerlink" title="setFrame"></a>setFrame</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">setFrame</span><span class="params">(<span class="keyword">int</span> l, <span class="keyword">int</span> t, <span class="keyword">int</span> r, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> changed = <span class="keyword">super</span>.setFrame(l, t, r, b);</span><br><span class="line">    mHaveFrame = <span class="keyword">true</span>;</span><br><span class="line">    configureBounds();<span class="comment">//imageView core method</span></span><br><span class="line">    <span class="keyword">return</span> changed;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="How-setSrc-and-setBackground"><a href="#How-setSrc-and-setBackground" class="headerlink" title="How setSrc and setBackground?"></a>How setSrc and setBackground?</h3><ul>
+<li><p>setBackGround:  same as View</p>
+</li>
+<li><p>setSrc: add a new parameter mDrawable and provider the four methods </p>
+<p>setImageResource</p>
+<p>setImageURI<br>setImageDrawable<br>setImageBitmap</p>
+<p>above all use the method configureBounds and then come to our slight by onDraw.</p>
+<p>give “setImageDrawable” as an Example.</p>
+</li>
+</ul>
+<h4 id="setImageResource"><a href="#setImageResource" class="headerlink" title="setImageResource"></a>setImageResource</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Sets a drawable as the content of this ImageView.</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * &lt;p class="note"&gt;This does Bitmap reading and decoding on the UI</span></span><br><span class="line"><span class="comment">   * thread, which can cause a latency hiccup.  If that's a concern,</span></span><br><span class="line"><span class="comment">   * consider using &#123;<span class="doctag">@link</span> #setImageDrawable(android.graphics.drawable.Drawable)&#125; or</span></span><br><span class="line"><span class="comment">   * &#123;<span class="doctag">@link</span> #setImageBitmap(android.graphics.Bitmap)&#125; and</span></span><br><span class="line"><span class="comment">   * &#123;<span class="doctag">@link</span> android.graphics.BitmapFactory&#125; instead.&lt;/p&gt;</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param</span> resId the resource identifier of the drawable</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@attr</span> ref android.R.styleable#ImageView_src</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * ##normal  steps</span></span><br><span class="line"><span class="comment">   * 1.store the oldWidth oldHeight</span></span><br><span class="line"><span class="comment">   * 2.updateDrawable (eg:callback,level ,bounds ,scaleType etc.)</span></span><br><span class="line"><span class="comment">   * 3.maybe you have to resolveUri which to decode the res</span></span><br><span class="line"><span class="comment">   * 4.at last requestLayout and then invalidate</span></span><br><span class="line"><span class="comment">   *<span class="doctag">@seeNext</span> updateDrawable()-&gt;configureBounds()</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@android</span>.view.RemotableViewMethod</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setImageResource</span><span class="params">(@DrawableRes <span class="keyword">int</span> resId)</span> </span>&#123;</span><br><span class="line">      <span class="comment">// The resource configuration may have changed, so we should always</span></span><br><span class="line">      <span class="comment">// try to load the resource even if the resId hasn't changed.</span></span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> oldWidth = mDrawableWidth;</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">int</span> oldHeight = mDrawableHeight;</span><br><span class="line"></span><br><span class="line">      updateDrawable(<span class="keyword">null</span>);</span><br><span class="line">      mResource = resId;</span><br><span class="line">      mUri = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">      resolveUri();</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (oldWidth != mDrawableWidth || oldHeight != mDrawableHeight) &#123;</span><br><span class="line">          requestLayout();</span><br><span class="line">      &#125;</span><br><span class="line">      invalidate();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="updateDrawable"><a href="#updateDrawable" class="headerlink" title="updateDrawable"></a>updateDrawable</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">updateDrawable</span><span class="params">(Drawable d)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (d != mRecycleableBitmapDrawable &amp;&amp; mRecycleableBitmapDrawable != <span class="keyword">null</span>) &#123;</span><br><span class="line">          mRecycleableBitmapDrawable.setBitmap(<span class="keyword">null</span>);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (mDrawable != <span class="keyword">null</span>) &#123;</span><br><span class="line">          mDrawable.setCallback(<span class="keyword">null</span>);</span><br><span class="line">          unscheduleDrawable(mDrawable);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      mDrawable = d;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (d != <span class="keyword">null</span>) &#123;</span><br><span class="line">          d.setCallback(<span class="keyword">this</span>);</span><br><span class="line">          d.setLayoutDirection(getLayoutDirection());</span><br><span class="line">          <span class="keyword">if</span> (d.isStateful()) &#123;</span><br><span class="line">              d.setState(getDrawableState());</span><br><span class="line">          &#125;</span><br><span class="line">          d.setVisible(getVisibility() == VISIBLE, <span class="keyword">true</span>);</span><br><span class="line">          d.setLevel(mLevel);</span><br><span class="line">          mDrawableWidth = d.getIntrinsicWidth();</span><br><span class="line">          mDrawableHeight = d.getIntrinsicHeight();</span><br><span class="line">          applyImageTint();</span><br><span class="line">          applyColorMod();</span><br><span class="line"></span><br><span class="line">          configureBounds();</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          mDrawableWidth = mDrawableHeight = -<span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="configBounds"><a href="#configBounds" class="headerlink" title="configBounds"></a>configBounds</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">configureBounds</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (mDrawable == <span class="keyword">null</span> || !mHaveFrame) &#123;</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">int</span> dwidth = mDrawableWidth;</span><br><span class="line">      <span class="keyword">int</span> dheight = mDrawableHeight;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">int</span> vwidth = getWidth() - mPaddingLeft - mPaddingRight;</span><br><span class="line">      <span class="keyword">int</span> vheight = getHeight() - mPaddingTop - mPaddingBottom;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">boolean</span> fits = (dwidth &lt; <span class="number">0</span> || vwidth == dwidth) &amp;&amp;</span><br><span class="line">                     (dheight &lt; <span class="number">0</span> || vheight == dheight);</span><br><span class="line"></span><br><span class="line">      <span class="comment">//type 1 :fit_xy = just fill our entire view</span></span><br><span class="line">      <span class="keyword">if</span> (dwidth &lt;= <span class="number">0</span> || dheight &lt;= <span class="number">0</span> || ScaleType.FIT_XY == mScaleType) &#123;</span><br><span class="line">          <span class="comment">/* If the drawable has no intrinsic size, or we're told to</span></span><br><span class="line"><span class="comment">              scaletofit, then we just fill our entire view.</span></span><br><span class="line"><span class="comment">          */</span></span><br><span class="line">          mDrawable.setBounds(<span class="number">0</span>, <span class="number">0</span>, vwidth, vheight);</span><br><span class="line">          mDrawMatrix = <span class="keyword">null</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// We need to do the scaling ourself, so have the drawable</span></span><br><span class="line">          <span class="comment">// use its native size.</span></span><br><span class="line">          mDrawable.setBounds(<span class="number">0</span>, <span class="number">0</span>, dwidth, dheight);</span><br><span class="line"></span><br><span class="line">          <span class="comment">//type 2 :matrix =  use special matrix</span></span><br><span class="line">          <span class="keyword">if</span> (ScaleType.MATRIX == mScaleType) &#123;</span><br><span class="line">              <span class="comment">// Use the specified matrix as-is.</span></span><br><span class="line">              <span class="keyword">if</span> (mMatrix.isIdentity()) &#123;</span><br><span class="line">                  mDrawMatrix = <span class="keyword">null</span>;</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  mDrawMatrix = mMatrix;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fits) &#123;</span><br><span class="line">              <span class="comment">// The bitmap fits exactly, no transform needed.</span></span><br><span class="line">              mDrawMatrix = <span class="keyword">null</span>;</span><br><span class="line">          &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ScaleType.CENTER == mScaleType) &#123;</span><br><span class="line">              <span class="comment">//type 3: center = move  the src center to the view center</span></span><br><span class="line">              <span class="comment">// Center bitmap in view, no scaling.</span></span><br><span class="line">              mDrawMatrix = mMatrix;</span><br><span class="line">              mDrawMatrix.setTranslate(Math.round((vwidth - dwidth) * <span class="number">0.5f</span>),</span><br><span class="line">                                       Math.round((vheight - dheight) * <span class="number">0.5f</span>));</span><br><span class="line">          &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ScaleType.CENTER_CROP == mScaleType) &#123;</span><br><span class="line">              <span class="comment">//type 4:center_crop=scale and the move the src center to the view center</span></span><br><span class="line">              <span class="comment">//</span></span><br><span class="line">              mDrawMatrix = mMatrix;</span><br><span class="line"></span><br><span class="line">              <span class="keyword">float</span> scale;</span><br><span class="line">              <span class="keyword">float</span> dx = <span class="number">0</span>, dy = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">              <span class="comment">// other: if(vheihgt/dheight &gt; vwidth/dwidth) chos max</span></span><br><span class="line">              <span class="keyword">if</span> (dwidth * vheight &gt; vwidth * dheight) &#123;</span><br><span class="line">                  scale = (<span class="keyword">float</span>) vheight / (<span class="keyword">float</span>) dheight; </span><br><span class="line">                  dx = (vwidth - dwidth * scale) * <span class="number">0.5f</span>;</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  scale = (<span class="keyword">float</span>) vwidth / (<span class="keyword">float</span>) dwidth;</span><br><span class="line">                  dy = (vheight - dheight * scale) * <span class="number">0.5f</span>;</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              mDrawMatrix.setScale(scale, scale);</span><br><span class="line">              mDrawMatrix.postTranslate(Math.round(dx), Math.round(dy));</span><br><span class="line">          &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ScaleType.CENTER_INSIDE == mScaleType) &#123;</span><br><span class="line">              mDrawMatrix = mMatrix;</span><br><span class="line">              <span class="keyword">float</span> scale;</span><br><span class="line">              <span class="keyword">float</span> dx;</span><br><span class="line">              <span class="keyword">float</span> dy;</span><br><span class="line">              </span><br><span class="line">              <span class="keyword">if</span> (dwidth &lt;= vwidth &amp;&amp; dheight &lt;= vheight) &#123;</span><br><span class="line">                  scale = <span class="number">1.0f</span>;</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  <span class="comment">//other : choose min</span></span><br><span class="line">                  scale = Math.min((<span class="keyword">float</span>) vwidth / (<span class="keyword">float</span>) dwidth,</span><br><span class="line">                          (<span class="keyword">float</span>) vheight / (<span class="keyword">float</span>) dheight);</span><br><span class="line">              &#125;</span><br><span class="line">              </span><br><span class="line">              dx = Math.round((vwidth - dwidth * scale) * <span class="number">0.5f</span>);</span><br><span class="line">              dy = Math.round((vheight - dheight * scale) * <span class="number">0.5f</span>);</span><br><span class="line"></span><br><span class="line">              mDrawMatrix.setScale(scale, scale);</span><br><span class="line">              mDrawMatrix.postTranslate(dx, dy);</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">              <span class="comment">// Generate the required transform.</span></span><br><span class="line">              mTempSrc.set(<span class="number">0</span>, <span class="number">0</span>, dwidth, dheight);</span><br><span class="line">              mTempDst.set(<span class="number">0</span>, <span class="number">0</span>, vwidth, vheight);</span><br><span class="line">              </span><br><span class="line">              mDrawMatrix = mMatrix;</span><br><span class="line">              mDrawMatrix.setRectToRect(mTempSrc, mTempDst, scaleTypeToScaleToFit(mScaleType));</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="onDraw"><a href="#onDraw" class="headerlink" title="onDraw"></a>onDraw</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">*simply apply mDrawMatrix(set by setImageMatrix) and then draw the canvas</span></span><br><span class="line"><span class="comment">**/</span></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onDraw(canvas);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mDrawable == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>; <span class="comment">// couldn't resolve the URI</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mDrawableWidth == <span class="number">0</span> || mDrawableHeight == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;     <span class="comment">// nothing to draw (empty bounds)</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mDrawMatrix == <span class="keyword">null</span> &amp;&amp; mPaddingTop == <span class="number">0</span> &amp;&amp; mPaddingLeft == <span class="number">0</span>) &#123;</span><br><span class="line">            mDrawable.draw(canvas);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> saveCount = canvas.getSaveCount();</span><br><span class="line">            canvas.save();</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> (mCropToPadding) &#123;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">int</span> scrollX = mScrollX;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">int</span> scrollY = mScrollY;</span><br><span class="line">                canvas.clipRect(scrollX + mPaddingLeft, scrollY + mPaddingTop,</span><br><span class="line">                        scrollX + mRight - mLeft - mPaddingRight,</span><br><span class="line">                        scrollY + mBottom - mTop - mPaddingBottom);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            canvas.translate(mPaddingLeft, mPaddingTop);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// here to effect the final slight</span></span><br><span class="line">            <span class="keyword">if</span> (mDrawMatrix != <span class="keyword">null</span>) &#123;</span><br><span class="line">                canvas.concat(mDrawMatrix);</span><br><span class="line">            &#125;</span><br><span class="line">            mDrawable.draw(canvas);</span><br><span class="line">            canvas.restoreToCount(saveCount);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2017/11/05/ImageView源码解读/" title="ImageView源码解读">http://jinjian.info/2017/11/05/ImageView源码解读/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RTFSC-Read-the-fucking-source-code/" rel="tag"># RTFSC (Read the fucking source code )</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/04/ListView源码解读/" rel="next" title="ListView源码解读">
+                <i class="fa fa-chevron-left"></i> ListView源码解读
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/11/Broadcaster源码解读/" rel="prev" title="Broadcaster源码解读">
+                Broadcaster源码解读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Qusetions"><span class="nav-number">1.</span> <span class="nav-text">Qusetions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#How-setScaleType？"><span class="nav-number">1.1.</span> <span class="nav-text">How setScaleType？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#setScaleType"><span class="nav-number">1.1.1.</span> <span class="nav-text">setScaleType</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#setFrame"><span class="nav-number">1.1.2.</span> <span class="nav-text">setFrame</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#How-setSrc-and-setBackground"><span class="nav-number">1.2.</span> <span class="nav-text">How setSrc and setBackground?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#setImageResource"><span class="nav-number">1.2.1.</span> <span class="nav-text">setImageResource</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#updateDrawable"><span class="nav-number">1.2.2.</span> <span class="nav-text">updateDrawable</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#configBounds"><span class="nav-number">1.2.3.</span> <span class="nav-text">configBounds</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onDraw"><span class="nav-number">1.2.4.</span> <span class="nav-text">onDraw</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

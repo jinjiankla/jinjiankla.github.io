@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="RTFSC (Read the fucking source code )," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire 2.0" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="主要功能消息传递12345678910111213前置消息生成hardWare&amp;amp;nativeCode -&amp;gt; InputEventReceiver(dispatchInputEvent)-&amp;gt;ViewRootImpl$WindowInputEventReceiver(dispatchInputEvent)-&amp;gt;ViewRootImpl(enqueueInputEvent) －&amp;">
+<meta name="keywords" content="RTFSC (Read the fucking source code )">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ViewRootImpl源码解读">
+<meta property="og:url" content="http://jinjian.info/2017/09/17/ViewRootImpl源码解读/index.html">
+<meta property="og:site_name" content="Desire 2.0">
+<meta property="og:description" content="主要功能消息传递12345678910111213前置消息生成hardWare&amp;amp;nativeCode -&amp;gt; InputEventReceiver(dispatchInputEvent)-&amp;gt;ViewRootImpl$WindowInputEventReceiver(dispatchInputEvent)-&amp;gt;ViewRootImpl(enqueueInputEvent) －&amp;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://jinjian.info/images/ViewRootImpl_U1.png">
+<meta property="og:image" content="http://jinjian.info/images/ViewRootImpl_U2.png">
+<meta property="og:image" content="http://jinjian.info/images/ViewRootImpl_U3.png">
+<meta property="og:updated_time" content="2017-12-23T19:39:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ViewRootImpl源码解读">
+<meta name="twitter:description" content="主要功能消息传递12345678910111213前置消息生成hardWare&amp;amp;nativeCode -&amp;gt; InputEventReceiver(dispatchInputEvent)-&amp;gt;ViewRootImpl$WindowInputEventReceiver(dispatchInputEvent)-&amp;gt;ViewRootImpl(enqueueInputEvent) －&amp;">
+<meta name="twitter:image" content="http://jinjian.info/images/ViewRootImpl_U1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2017/09/17/ViewRootImpl源码解读/"/>
+
+
+
+
+
+  <title>ViewRootImpl源码解读 | Desire 2.0</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire 2.0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2017/09/17/ViewRootImpl源码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire 2.0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ViewRootImpl源码解读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T00:00:00+08:00">
+                2017-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读别人的源码，涨自己的智慧/" itemprop="url" rel="index">
+                    <span itemprop="name">读别人的源码，涨自己的智慧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  976字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h2><h3 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">前置消息生成</span><br><span class="line">hardWare&amp;nativeCode -&gt; </span><br><span class="line"></span><br><span class="line">InputEventReceiver(dispatchInputEvent)-&gt;</span><br><span class="line"></span><br><span class="line">ViewRootImpl$WindowInputEventReceiver(dispatchInputEvent)-&gt;</span><br><span class="line"></span><br><span class="line">ViewRootImpl(enqueueInputEvent) －&gt;	</span><br><span class="line"></span><br><span class="line">if processImmediately</span><br><span class="line"> ViewRootImpl(doProcessInputEvents)  </span><br><span class="line">else</span><br><span class="line"> ViewRootImpl(scheduleProcessInputEvents)</span><br></pre></td></tr></table></figure>
+<h4 id="KeyEvent"><a href="#KeyEvent" class="headerlink" title="KeyEvent"></a>KeyEvent</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Target:to find the focus one self or child.</span><br><span class="line"></span><br><span class="line">get from QueuedInputEvent .....-&gt;</span><br><span class="line"></span><br><span class="line">ViewRootImpl$ViewPostImeInputStage(onProcess)-&gt;</span><br><span class="line"></span><br><span class="line">ViewRootImpl$ViewPostImeInputStage(processKeyEvent)-&gt;</span><br><span class="line"></span><br><span class="line">PhoneWindow$DecorView(dispatchKeyEvent)-&gt;</span><br><span class="line"></span><br><span class="line">Activity implenments Windows.CallBack(dispathcKeyEvent) -&gt;</span><br><span class="line"></span><br><span class="line">PhoneWindow$DecorView(superDispatchKeyEvent) -&gt;</span><br><span class="line"></span><br><span class="line">ViewGroup(dispatchKeyEvent) -&gt;</span><br><span class="line"></span><br><span class="line">View(dispatchKeyEvent) -&gt;</span><br><span class="line"></span><br><span class="line">KeyEvent(dispatch)</span><br></pre></td></tr></table></figure>
+<h5 id="ViewGroup-dispatchKeyEvent"><a href="#ViewGroup-dispatchKeyEvent" class="headerlink" title="ViewGroup:dispatchKeyEvent"></a>ViewGroup:dispatchKeyEvent</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchKeyEvent</span><span class="params">(KeyEvent event)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mInputEventConsistencyVerifier != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mInputEventConsistencyVerifier.onKeyEvent(event, <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//##important:here decide parent first and then child</span></span><br><span class="line">      <span class="comment">//## to find the focus one </span></span><br><span class="line">        <span class="keyword">if</span> ((mPrivateFlags &amp; (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS))</span><br><span class="line">                == (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">super</span>.dispatchKeyEvent(event)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mFocused != <span class="keyword">null</span> &amp;&amp; (mFocused.mPrivateFlags &amp; PFLAG_HAS_BOUNDS)</span><br><span class="line">                == PFLAG_HAS_BOUNDS) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mFocused.dispatchKeyEvent(event)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mInputEventConsistencyVerifier != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mInputEventConsistencyVerifier.onUnhandledEvent(event, <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="View-dispatchKeyEvent"><a href="#View-dispatchKeyEvent" class="headerlink" title="View:dispatchKeyEvent"></a>View:dispatchKeyEvent</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * Dispatch a key event to the next view on the focus path. This path runs</span></span><br><span class="line"><span class="comment">  * from the top of the view tree down to the currently focused view. If this</span></span><br><span class="line"><span class="comment">  * view has focus, it will dispatch to itself. Otherwise it will dispatch</span></span><br><span class="line"><span class="comment">  * the next node down the focus path. This method also fires any key</span></span><br><span class="line"><span class="comment">  * listeners.</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> event The key event to be dispatched.</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@return</span> True if the event was handled, false otherwise.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchKeyEvent</span><span class="params">(KeyEvent event)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (mInputEventConsistencyVerifier != <span class="keyword">null</span>) &#123;</span><br><span class="line">         mInputEventConsistencyVerifier.onKeyEvent(event, <span class="number">0</span>);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// Give any attached key listener a first crack at the event.</span></span><br><span class="line">     <span class="comment">//noinspection SimplifiableIfStatement</span></span><br><span class="line">   <span class="comment">// setOnKeyListener </span></span><br><span class="line">     ListenerInfo li = mListenerInfo;</span><br><span class="line">     <span class="keyword">if</span> (li != <span class="keyword">null</span> &amp;&amp; li.mOnKeyListener != <span class="keyword">null</span> &amp;&amp; (mViewFlags &amp; ENABLED_MASK) == ENABLED</span><br><span class="line">             &amp;&amp; li.mOnKeyListener.onKey(<span class="keyword">this</span>, event.getKeyCode(), event)) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (event.dispatch(<span class="keyword">this</span>, mAttachInfo != <span class="keyword">null</span></span><br><span class="line">             ? mAttachInfo.mKeyDispatchState : <span class="keyword">null</span>, <span class="keyword">this</span>)) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (mInputEventConsistencyVerifier != <span class="keyword">null</span>) &#123;</span><br><span class="line">         mInputEventConsistencyVerifier.onUnhandledEvent(event, <span class="number">0</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Activity-dispatchKeyEvent"><a href="#Activity-dispatchKeyEvent" class="headerlink" title="Activity:dispatchKeyEvent"></a>Activity:dispatchKeyEvent</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Called to process key events.  You can override this to intercept all</span></span><br><span class="line"><span class="comment"> * key events before they are dispatched to the window.  Be sure to call</span></span><br><span class="line"><span class="comment"> * this implementation for key events that should be handled normally.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> event The key event.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> boolean Return true if this event was consumed.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dispatchKeyEvent</span><span class="params">(KeyEvent event)</span> </span>&#123;</span><br><span class="line">    onUserInteraction();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Let action bars open menus in response to the menu key prioritized over</span></span><br><span class="line">    <span class="comment">// the window handling it</span></span><br><span class="line">    <span class="keyword">if</span> (event.getKeyCode() == KeyEvent.KEYCODE_MENU &amp;&amp;</span><br><span class="line">            mActionBar != <span class="keyword">null</span> &amp;&amp; mActionBar.onMenuKeyEvent(event)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//##important:here decide the sequece ViewGroup View Activity;</span></span><br><span class="line">    Window win = getWindow();</span><br><span class="line">    <span class="keyword">if</span> (win.superDispatchKeyEvent(event)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    View decor = mDecor;</span><br><span class="line">    <span class="keyword">if</span> (decor == <span class="keyword">null</span>) decor = win.getDecorView();</span><br><span class="line">  <span class="comment">// at last </span></span><br><span class="line">    <span class="keyword">return</span> event.dispatch(<span class="keyword">this</span>, decor != <span class="keyword">null</span></span><br><span class="line">            ? decor.getKeyDispatcherState() : <span class="keyword">null</span>, <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="TouchEvent"><a href="#TouchEvent" class="headerlink" title="TouchEvent"></a>TouchEvent</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Sequence:dispatchTouchEvent,onInterceptTouchEvent,onTouchEvent ,U型传递</span><br><span class="line"></span><br><span class="line">get from  QueueInputEvent....-&gt;</span><br><span class="line">ViewRootImpl$ViewPostImeInputStage(processPointerEvent)-&gt;</span><br><span class="line">View(dispatchPointerEvent)-&gt;</span><br><span class="line">PhoneWindow$DecorView(dispatchTouchEvent)-&gt;</span><br><span class="line">Activity implements Windows.CallBack:(dispatchTouchEvent)-&gt;</span><br><span class="line">PhoneWindow$DecorView(superDispatchTouchEvent)-&gt;</span><br><span class="line">ViewGroup(dispatchTouchEvent)-&gt;</span><br><span class="line">View(dispatchTouchEvent)-&gt; </span><br><span class="line">.........</span><br></pre></td></tr></table></figure>
+<h5 id="U型传递图"><a href="#U型传递图" class="headerlink" title="U型传递图"></a>U型传递图</h5><p><img src="/images/ViewRootImpl_U1.png" alt="ViewRootImpl_U1"></p>
+<p><img src="/images/ViewRootImpl_U2.png" alt="ViewRootImpl_U2"></p>
+<p><img src="/images/ViewRootImpl_U3.png" alt="ViewRootImpl_U3"></p>
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><ol>
+<li>touch事件先子View后父View,key事件先父View后子View,Activity作为兜底方案</li>
+<li>不论是touch事件还是key事件都是自顶向下分发的</li>
+<li>…….</li>
+</ol>
+<h3 id="与windowsManagerService通信"><a href="#与windowsManagerService通信" class="headerlink" title="与windowsManagerService通信"></a>与windowsManagerService通信</h3><h4 id="IWindowSession"><a href="#IWindowSession" class="headerlink" title="IWindowSession"></a>IWindowSession</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">new ViewRootImpl -&gt;</span><br><span class="line">WindowManagerGlobal(getWindowSession)-&gt;</span><br><span class="line">WindowManagerService(openSession) -&gt;</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<h5 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h5><p>This class represents an active client session.  There is generally one Session object per process that is interacting with the window manager.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//## from WindowManagerService openSession</span></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> IWindowSession <span class="title">openSession</span><span class="params">(IWindowSessionCallback callback, IInputMethodClient client,</span></span></span><br><span class="line"><span class="function"><span class="params">          IInputContext inputContext)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (client == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"null client"</span>);</span><br><span class="line">      <span class="keyword">if</span> (inputContext == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"null inputContext"</span>);</span><br><span class="line">      Session session = <span class="keyword">new</span> Session(<span class="keyword">this</span>, callback, client, inputContext);</span><br><span class="line">      <span class="keyword">return</span> session;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="SurfaceSession"><a href="#SurfaceSession" class="headerlink" title="SurfaceSession"></a>SurfaceSession</h4><h5 id="How-to-Create"><a href="#How-to-Create" class="headerlink" title="How to Create"></a>How to Create</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ActivityThread(handleResumeActivity) -&gt;</span><br><span class="line"></span><br><span class="line">WindowManagerGlobal(addView)-&gt;</span><br><span class="line"></span><br><span class="line">ViewRootImpl(setView) -&gt;</span><br><span class="line"></span><br><span class="line">Session(addToDisplay)-&gt;</span><br><span class="line"></span><br><span class="line">WindowManagerService(addWindow) -&gt;</span><br><span class="line"></span><br><span class="line">WindowState(attach) -&gt;</span><br><span class="line"></span><br><span class="line">Session(windowAddedLocked)-&gt;</span><br><span class="line"></span><br><span class="line">new SurfaceSession</span><br></pre></td></tr></table></figure>
+<h3 id="触发视图的更新"><a href="#触发视图的更新" class="headerlink" title="触发视图的更新"></a>触发视图的更新</h3><h4 id="Activity的onCreate"><a href="#Activity的onCreate" class="headerlink" title="Activity的onCreate"></a>Activity的onCreate</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ActivityThread(handleLaunchActivity) -&gt; </span><br><span class="line"></span><br><span class="line">ActivityThread performLaunchActivity -&gt;</span><br><span class="line"></span><br><span class="line">Instrumentation(callActivityOnCreate) -&gt;</span><br><span class="line"></span><br><span class="line">Activity(onCreate)</span><br></pre></td></tr></table></figure>
+<h4 id="DecorView的建立"><a href="#DecorView的建立" class="headerlink" title="DecorView的建立"></a>DecorView的建立</h4><p>via setContentView </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Activity (setContentView)-&gt;</span><br><span class="line"></span><br><span class="line">PhoneWindow(setContentView)-&gt;</span><br><span class="line"></span><br><span class="line">PhoneWindow(installDecor)-&gt;</span><br><span class="line"></span><br><span class="line">PhoneWindow(generateDecor)-&gt;</span><br><span class="line"></span><br><span class="line">new DecorView -&gt; LayoutInflater .......</span><br></pre></td></tr></table></figure>
+<h4 id="DecorView的添加"><a href="#DecorView的添加" class="headerlink" title="DecorView的添加"></a>DecorView的添加</h4><p>via onResume</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//## Surface create in ViewRootImpl but is Empty</span></span><br><span class="line"><span class="comment">//## surface filled data in outSurface.copyFrom(surfaceControl)</span></span><br><span class="line"></span><br><span class="line">ActivityThread (handleResumeActivity) -&gt;</span><br><span class="line"></span><br><span class="line">WindowManagerGlobal(addView)-&gt;</span><br><span class="line"></span><br><span class="line">ViewRootImpl(setView)-&gt;</span><br><span class="line"></span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">ViewRootImpl(performTraversals)-&gt;</span><br><span class="line"></span><br><span class="line">ViewRootImpl(relayoutWindow)-&gt; </span><br><span class="line"></span><br><span class="line">Session(relayout)-&gt;</span><br><span class="line"></span><br><span class="line">WindowManagerService(relayoutWindow)-&gt; </span><br><span class="line"></span><br><span class="line">WindowStateAnimator createSurfaceLocked  outSurface.copyFrom(surfaceControl)-&gt;.....</span><br></pre></td></tr></table></figure>
+<h4 id="AttachToWindow"><a href="#AttachToWindow" class="headerlink" title="AttachToWindow"></a>AttachToWindow</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ActivityThread(handleResumeActivity)-&gt;</span><br><span class="line">  </span><br><span class="line">WindowManagerGlobal(addView)-&gt;</span><br><span class="line">  </span><br><span class="line">ViewRootImpl(setView)-&gt;</span><br><span class="line">  </span><br><span class="line">ViewRootImpl(requestLayout) ......-&gt;</span><br><span class="line">  </span><br><span class="line">ViewRootImpl(performTraversals)</span><br><span class="line">[here  host.dispatchAttachedToWindow ,host.dispatchWindowVisibilityChanged ......onMeasure ,onLayout,onDraw....]-&gt;</span><br><span class="line">  </span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<h4 id="DettachToWindow"><a href="#DettachToWindow" class="headerlink" title="DettachToWindow"></a>DettachToWindow</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">ActivityThread(handleDestroyActivity)-&gt;</span><br><span class="line">  </span><br><span class="line">WindowManagerImpl(removeViewImmediate)-&gt;</span><br><span class="line">  </span><br><span class="line">WindowManagerGlobal(removeView)-&gt;</span><br><span class="line">  </span><br><span class="line">WindowManagerGlobal(removeViewLocked)-&gt; </span><br><span class="line">  </span><br><span class="line">ViewRootImpl(die)-&gt;</span><br><span class="line">  </span><br><span class="line">ViewRootImpl(doDie)-&gt;</span><br><span class="line">  </span><br><span class="line">ViewRootImpl(dispatchDetachedFromWindow)-&gt;</span><br><span class="line">  </span><br><span class="line">View(dispatchDetachedFromWindow)-&gt;</span><br><span class="line">  </span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="数据生命周期"><a href="#数据生命周期" class="headerlink" title="数据生命周期"></a>数据生命周期</h3><h4 id="attachInfo"><a href="#attachInfo" class="headerlink" title="attachInfo"></a>attachInfo</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//##ViewRootImpl</span></span><br><span class="line"><span class="comment">//Create </span></span><br><span class="line"><span class="keyword">new</span> ViewRootImpl-&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> View.AttachInfo(mWindowSession, mWindow, display, <span class="keyword">this</span>, mHandler, <span class="keyword">this</span>)</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="comment">//dispatch to children</span></span><br><span class="line">dispatchAttachedToWindow</span><br><span class="line"></span><br><span class="line"><span class="comment">//destory</span></span><br><span class="line">dispatchDetachedFromWindow[attachinfo=<span class="keyword">null</span>]</span><br></pre></td></tr></table></figure>
+<h4 id="viewParent"><a href="#viewParent" class="headerlink" title="viewParent"></a>viewParent</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//##ViewRootImpl</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//dispatch to children  on dispatchAttachToWindow</span></span><br><span class="line">assignParent(<span class="keyword">this</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//detory on dispatchDetachFromWindow</span></span><br><span class="line">assignParent(<span class="keyword">null</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><p>U型传递</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2017/09/17/ViewRootImpl源码解读/" title="ViewRootImpl源码解读">http://jinjian.info/2017/09/17/ViewRootImpl源码解读/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RTFSC-Read-the-fucking-source-code/" rel="tag"># RTFSC (Read the fucking source code )</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/10/canvas的使用/" rel="next" title="关于canvas的使用">
+                <i class="fa fa-chevron-left"></i> 关于canvas的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/24/SurfaceView源码解读/" rel="prev" title="SurfaceView源码解读">
+                SurfaceView源码解读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主要功能"><span class="nav-number">1.</span> <span class="nav-text">主要功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#消息传递"><span class="nav-number">1.1.</span> <span class="nav-text">消息传递</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#KeyEvent"><span class="nav-number">1.1.1.</span> <span class="nav-text">KeyEvent</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ViewGroup-dispatchKeyEvent"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">ViewGroup:dispatchKeyEvent</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#View-dispatchKeyEvent"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">View:dispatchKeyEvent</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Activity-dispatchKeyEvent"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">Activity:dispatchKeyEvent</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TouchEvent"><span class="nav-number">1.1.2.</span> <span class="nav-text">TouchEvent</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#U型传递图"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">U型传递图</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结："><span class="nav-number">1.1.3.</span> <span class="nav-text">总结：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与windowsManagerService通信"><span class="nav-number">1.2.</span> <span class="nav-text">与windowsManagerService通信</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IWindowSession"><span class="nav-number">1.2.1.</span> <span class="nav-text">IWindowSession</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Session"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">Session</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SurfaceSession"><span class="nav-number">1.2.2.</span> <span class="nav-text">SurfaceSession</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#How-to-Create"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">How to Create</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#触发视图的更新"><span class="nav-number">1.3.</span> <span class="nav-text">触发视图的更新</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Activity的onCreate"><span class="nav-number">1.3.1.</span> <span class="nav-text">Activity的onCreate</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DecorView的建立"><span class="nav-number">1.3.2.</span> <span class="nav-text">DecorView的建立</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DecorView的添加"><span class="nav-number">1.3.3.</span> <span class="nav-text">DecorView的添加</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AttachToWindow"><span class="nav-number">1.3.4.</span> <span class="nav-text">AttachToWindow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DettachToWindow"><span class="nav-number">1.3.5.</span> <span class="nav-text">DettachToWindow</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">2.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据生命周期"><span class="nav-number">2.1.</span> <span class="nav-text">数据生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#attachInfo"><span class="nav-number">2.1.1.</span> <span class="nav-text">attachInfo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#viewParent"><span class="nav-number">2.1.2.</span> <span class="nav-text">viewParent</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TODO"><span class="nav-number">3.</span> <span class="nav-text">TODO</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

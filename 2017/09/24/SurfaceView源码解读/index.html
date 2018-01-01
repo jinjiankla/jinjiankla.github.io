@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="RTFSC (Read the fucking source code )," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire 2.0" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="surfaceView的建立整体流程 performTraversals12345678910111213141516171819202122232425private void performTraversals() &amp;#123;  boolean viewVisibilityChanged = mViewVisibility != viewVisibility            || mN">
+<meta name="keywords" content="RTFSC (Read the fucking source code )">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SurfaceView源码解读">
+<meta property="og:url" content="http://jinjian.info/2017/09/24/SurfaceView源码解读/index.html">
+<meta property="og:site_name" content="Desire 2.0">
+<meta property="og:description" content="surfaceView的建立整体流程 performTraversals12345678910111213141516171819202122232425private void performTraversals() &amp;#123;  boolean viewVisibilityChanged = mViewVisibility != viewVisibility            || mN">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://jinjian.info/images/SurfaveView_Create.png">
+<meta property="og:image" content="http://jinjian.info/images/SurfaceView_Hold.png">
+<meta property="og:image" content="http://jinjian.info/images/SurfaceView_Flow.png">
+<meta property="og:updated_time" content="2017-12-23T19:39:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SurfaceView源码解读">
+<meta name="twitter:description" content="surfaceView的建立整体流程 performTraversals12345678910111213141516171819202122232425private void performTraversals() &amp;#123;  boolean viewVisibilityChanged = mViewVisibility != viewVisibility            || mN">
+<meta name="twitter:image" content="http://jinjian.info/images/SurfaveView_Create.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2017/09/24/SurfaceView源码解读/"/>
+
+
+
+
+
+  <title>SurfaceView源码解读 | Desire 2.0</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire 2.0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2017/09/24/SurfaceView源码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire 2.0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SurfaceView源码解读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-24T00:00:00+08:00">
+                2017-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读别人的源码，涨自己的智慧/" itemprop="url" rel="index">
+                    <span itemprop="name">读别人的源码，涨自己的智慧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,801字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="surfaceView的建立"><a href="#surfaceView的建立" class="headerlink" title="surfaceView的建立"></a>surfaceView的建立</h2><h3 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h3><p><img src="/images/SurfaveView_Create.png" alt="SurfaveView_Create"></p>
+<h3 id="performTraversals"><a href="#performTraversals" class="headerlink" title="performTraversals"></a>performTraversals</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">performTraversals</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">boolean</span> viewVisibilityChanged = mViewVisibility != viewVisibility</span><br><span class="line">            || mNewSurfaceNeeded;</span><br><span class="line">    ......</span><br><span class="line">    Rect frame = mWinFrame;</span><br><span class="line">   <span class="comment">//default is true,indicate whether the view is first attached to the windows.</span></span><br><span class="line">  <span class="comment">// if mFirst is true ,we should inital the attchinfo,and then dispatch it to its children </span></span><br><span class="line">    <span class="keyword">if</span> (mFirst) &#123;</span><br><span class="line">       .........</span><br><span class="line">        host.dispatchAttachedToWindow(mAttachInfo, <span class="number">0</span>);</span><br><span class="line">        mAttachInfo.mTreeObserver.dispatchOnWindowAttachedChange(<span class="keyword">true</span>);</span><br><span class="line">        dispatchApplyInsets(host);</span><br><span class="line">        <span class="comment">//Log.i(TAG, "Screen on initialized: " + attachInfo.mKeepScreenOn);</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       .......</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (viewVisibilityChanged) &#123;</span><br><span class="line">        mAttachInfo.mWindowVisibility = viewVisibility;</span><br><span class="line">        host.dispatchWindowVisibilityChanged(viewVisibility);</span><br><span class="line">          ......</span><br><span class="line">    &#125;</span><br><span class="line">     ......</span><br><span class="line">  ｝</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="dispatchAttachToWindow"><a href="#dispatchAttachToWindow" class="headerlink" title="dispatchAttachToWindow"></a>dispatchAttachToWindow</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> info the &#123;<span class="doctag">@link</span> android.view.View.AttachInfo&#125; to associated with</span></span><br><span class="line"><span class="comment">  *        this view</span></span><br><span class="line"><span class="comment">      notify FOUR:</span></span><br><span class="line"><span class="comment">      1.onAttachedToWindow()</span></span><br><span class="line"><span class="comment">      2.OnAttachStateChangeListener.onViewAttachToWindow()</span></span><br><span class="line"><span class="comment">      3.onWindowVisibilityChanged()</span></span><br><span class="line"><span class="comment">      4.onVisibilityChanged()</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">dispatchAttachedToWindow</span><span class="params">(AttachInfo info, <span class="keyword">int</span> visibility)</span> </span>&#123;</span><br><span class="line">     <span class="comment">//System.out.println("Attached! " + this);</span></span><br><span class="line">     mAttachInfo = info;</span><br><span class="line">        .......</span><br><span class="line">     onAttachedToWindow();</span><br><span class="line"></span><br><span class="line">     ListenerInfo li = mListenerInfo;</span><br><span class="line">     <span class="keyword">final</span> CopyOnWriteArrayList&lt;OnAttachStateChangeListener&gt; listeners =</span><br><span class="line">             li != <span class="keyword">null</span> ? li.mOnAttachStateChangeListeners : <span class="keyword">null</span>;</span><br><span class="line">     <span class="keyword">if</span> (listeners != <span class="keyword">null</span> &amp;&amp; listeners.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">         <span class="comment">// <span class="doctag">NOTE:</span> because of the use of CopyOnWriteArrayList, we *must* use an iterator to</span></span><br><span class="line">         <span class="comment">// perform the dispatching. The iterator is a safe guard against listeners that</span></span><br><span class="line">         <span class="comment">// could mutate the list by calling the various add/remove methods. This prevents</span></span><br><span class="line">         <span class="comment">// the array from being modified while we iterate it.</span></span><br><span class="line">         <span class="keyword">for</span> (OnAttachStateChangeListener listener : listeners) &#123;</span><br><span class="line">             listener.onViewAttachedToWindow(<span class="keyword">this</span>);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">int</span> vis = info.mWindowVisibility;</span><br><span class="line">     <span class="keyword">if</span> (vis != GONE) &#123;</span><br><span class="line">         onWindowVisibilityChanged(vis);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// Send onVisibilityChanged directly instead of dispatchVisibilityChanged.</span></span><br><span class="line">     <span class="comment">// As all views in the subtree will already receive dispatchAttachedToWindow</span></span><br><span class="line">     <span class="comment">// traversing the subtree again here is not desired.</span></span><br><span class="line">     onVisibilityChanged(<span class="keyword">this</span>, visibility);</span><br><span class="line"></span><br><span class="line">   ......</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="onAttachToWindow"><a href="#onAttachToWindow" class="headerlink" title="onAttachToWindow"></a>onAttachToWindow</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">1.restore the session who communicate with windowManagerServices</span></span><br><span class="line"><span class="comment">2.do ViewTreeObserver notify</span></span><br><span class="line"><span class="comment">**/</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onAttachedToWindow</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onAttachedToWindow();</span><br><span class="line">        mParent.requestTransparentRegion(<span class="keyword">this</span>);</span><br><span class="line">        <span class="comment">//mSession to  communication with the window manager Services</span></span><br><span class="line">        <span class="comment">//IWindowSession</span></span><br><span class="line">        mSession = getWindowSession();</span><br><span class="line">        mLayout.token = getWindowToken();</span><br><span class="line">        mLayout.setTitle(<span class="string">"SurfaceView"</span>);</span><br><span class="line">        mViewVisibility = getVisibility() == VISIBLE;</span><br><span class="line">        <span class="keyword">if</span> (!mGlobalListenersAdded) &#123;</span><br><span class="line">            ViewTreeObserver observer = getViewTreeObserver();</span><br><span class="line">            observer.addOnScrollChangedListener(mScrollChangedListener);</span><br><span class="line">            observer.addOnPreDrawListener(mDrawListener);</span><br><span class="line">            mGlobalListenersAdded = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="dispatchWindowVisibilityChanged"><a href="#dispatchWindowVisibilityChanged" class="headerlink" title="dispatchWindowVisibilityChanged"></a>dispatchWindowVisibilityChanged</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Dispatch a view visibility change down the view hierarchy.</span></span><br><span class="line"><span class="comment"> * ViewGroups should override to route to their children.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> changedView The view whose visibility changed. Could be 'this' or</span></span><br><span class="line"><span class="comment"> * an ancestor view.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> visibility The new visibility of changedView: &#123;<span class="doctag">@link</span> #VISIBLE&#125;,</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> #INVISIBLE&#125; or &#123;<span class="doctag">@link</span> #GONE&#125;.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">dispatchVisibilityChanged</span><span class="params">(@NonNull View changedView,</span></span></span><br><span class="line"><span class="function"><span class="params">        @Visibility <span class="keyword">int</span> visibility)</span> </span>&#123;</span><br><span class="line">    onVisibilityChanged(changedView, visibility);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="onVisibilityChanged"><a href="#onVisibilityChanged" class="headerlink" title="onVisibilityChanged"></a>onVisibilityChanged</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onWindowVisibilityChanged</span><span class="params">(<span class="keyword">int</span> visibility)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onWindowVisibilityChanged(visibility);</span><br><span class="line">    mWindowVisibility = visibility == VISIBLE;</span><br><span class="line">    mRequestedVisible = mWindowVisibility &amp;&amp; mViewVisibility;</span><br><span class="line">    updateWindow(<span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="updateWindow"><a href="#updateWindow" class="headerlink" title="updateWindow"></a>updateWindow</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  1.use windowsManagerServices session to addToDisplayWithoutInputChannel</span></span><br><span class="line"><span class="comment">  (add a new  windowState to windowsManagerServices and without inputChannel) </span></span><br><span class="line"><span class="comment">  2.use windowsManagerServices session to relayout</span></span><br><span class="line"><span class="comment">  (use mNewSurface size to draw Canvas)</span></span><br><span class="line"><span class="comment">  3.surfaceHolder callbacks (create,surfaceChange,surfaceDestory......)</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment">  tips:</span></span><br><span class="line"><span class="comment">  WindowState代表WMS中的一个窗口，这和App端的Window类是不一样的，尽管很多时候一个Window类（即PhoneWindow）有一个对应的WindowState，但那不是绝对的。一个Activity在WMS中有对应的AppWindowToken，一个AppWindowToken又可以包含多个WindowState，因为除了主窗口外，还可能有子窗口和启动窗口。此外对于系统窗口，WindowState还可能不对应AppWindowToken。</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="comment">/** <span class="doctag">@hide</span> */</span></span><br><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">updateWindow</span><span class="params">(<span class="keyword">boolean</span> force, <span class="keyword">boolean</span> redrawNeeded)</span> </span>&#123;</span><br><span class="line">          <span class="comment">//......</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (force || creating || formatChanged || sizeChanged || visibleChanged</span><br><span class="line">         || mLeft != mLocation[<span class="number">0</span>] || mTop != mLocation[<span class="number">1</span>]</span><br><span class="line">         || mUpdateWindowNeeded || mReportDrawNeeded || redrawNeeded) &#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// ......</span></span><br><span class="line"></span><br><span class="line">             <span class="keyword">if</span> (mWindow == <span class="keyword">null</span>) &#123;</span><br><span class="line">                 Display display = getDisplay();</span><br><span class="line">                 mWindow = <span class="keyword">new</span> MyWindow(<span class="keyword">this</span>);</span><br><span class="line">                 mLayout.type = mWindowType;</span><br><span class="line">                 mLayout.gravity = Gravity.START|Gravity.TOP;</span><br><span class="line">                 <span class="comment">//viewRootImpl的setView也用了addToDisplay</span></span><br><span class="line">                 mSession.addToDisplayWithoutInputChannel(mWindow, mWindow.mSeq, mLayout,</span><br><span class="line">                         mVisible ? VISIBLE : GONE, display.getDisplayId(), mContentInsets,</span><br><span class="line">                         mStableInsets);</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">boolean</span> realSizeChanged;</span><br><span class="line">             <span class="keyword">boolean</span> reportDrawNeeded;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">int</span> relayoutResult;</span><br><span class="line">             mSurfaceLock.lock();</span><br><span class="line">          <span class="comment">//.......</span></span><br><span class="line"></span><br><span class="line">                 relayoutResult = mSession.relayout(</span><br><span class="line">                     mWindow, mWindow.mSeq, mLayout, mWidth, mHeight,</span><br><span class="line">                         visible ? VISIBLE : GONE,</span><br><span class="line">                         WindowManagerGlobal.RELAYOUT_DEFER_SURFACE_DESTROY,</span><br><span class="line">                         mWinFrame, mOverscanInsets, mContentInsets,</span><br><span class="line">                         mVisibleInsets, mStableInsets, mOutsets, mConfiguration,</span><br><span class="line">                         mNewSurface);</span><br><span class="line"></span><br><span class="line">             ......</span><br><span class="line">          <span class="comment">// ----------------------------do surfaceHolder callBack ----------------------</span></span><br><span class="line">                 <span class="keyword">final</span> <span class="keyword">boolean</span> surfaceChanged = (relayoutResult</span><br><span class="line">                         &amp; WindowManagerGlobal.RELAYOUT_RES_SURFACE_CHANGED) != <span class="number">0</span>;</span><br><span class="line">                 <span class="keyword">if</span> (mSurfaceCreated &amp;&amp; (surfaceChanged || (!visible &amp;&amp; visibleChanged))) &#123;</span><br><span class="line">                     mSurfaceCreated = <span class="keyword">false</span>;</span><br><span class="line">                     <span class="keyword">if</span> (mSurface.isValid()) &#123;</span><br><span class="line">                         <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"visibleChanged -- surfaceDestroyed"</span>);</span><br><span class="line">                         callbacks = getSurfaceCallbacks();</span><br><span class="line">                         <span class="keyword">for</span> (SurfaceHolder.Callback c : callbacks) &#123;</span><br><span class="line">                    <span class="comment">//surfaceDestory </span></span><br><span class="line">                             c.surfaceDestroyed(mSurfaceHolder);</span><br><span class="line">                         &#125;</span><br><span class="line">                     &#125;</span><br><span class="line">                 &#125;</span><br><span class="line"></span><br><span class="line">                 mSurface.transferFrom(mNewSurface);</span><br><span class="line"></span><br><span class="line">                 <span class="keyword">if</span> (visible &amp;&amp; mSurface.isValid()) &#123;</span><br><span class="line">                     <span class="keyword">if</span> (!mSurfaceCreated &amp;&amp; (surfaceChanged || visibleChanged)) &#123;</span><br><span class="line">                         mSurfaceCreated = <span class="keyword">true</span>;</span><br><span class="line">                         mIsCreating = <span class="keyword">true</span>;</span><br><span class="line">                         <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"visibleChanged -- surfaceCreated"</span>);</span><br><span class="line">                         <span class="keyword">if</span> (callbacks == <span class="keyword">null</span>) &#123;</span><br><span class="line">                             callbacks = getSurfaceCallbacks();</span><br><span class="line">                         &#125;</span><br><span class="line">                         <span class="keyword">for</span> (SurfaceHolder.Callback c : callbacks) &#123;</span><br><span class="line">                           <span class="comment">//surfaceCreated</span></span><br><span class="line">                             c.surfaceCreated(mSurfaceHolder);</span><br><span class="line">                         &#125;</span><br><span class="line">                     &#125;</span><br><span class="line">                     <span class="keyword">if</span> (creating || formatChanged || sizeChanged</span><br><span class="line">                             || visibleChanged || realSizeChanged) &#123;</span><br><span class="line">                         <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"surfaceChanged -- format="</span> + mFormat</span><br><span class="line">                                 + <span class="string">" w="</span> + myWidth + <span class="string">" h="</span> + myHeight);</span><br><span class="line">                         <span class="keyword">if</span> (callbacks == <span class="keyword">null</span>) &#123;</span><br><span class="line">                             callbacks = getSurfaceCallbacks();</span><br><span class="line">                         &#125;</span><br><span class="line">                         <span class="keyword">for</span> (SurfaceHolder.Callback c : callbacks) &#123;</span><br><span class="line">                           <span class="comment">//surfaceChanged</span></span><br><span class="line">                             c.surfaceChanged(mSurfaceHolder, mFormat, myWidth, myHeight);</span><br><span class="line">                         &#125;</span><br><span class="line">                     &#125;</span><br><span class="line">                     <span class="keyword">if</span> (redrawNeeded) &#123;</span><br><span class="line">                         <span class="keyword">if</span> (DEBUG) Log.i(TAG, <span class="string">"surfaceRedrawNeeded"</span>);</span><br><span class="line">                         <span class="keyword">if</span> (callbacks == <span class="keyword">null</span>) &#123;</span><br><span class="line">                             callbacks = getSurfaceCallbacks();</span><br><span class="line">                         &#125;</span><br><span class="line">                         <span class="keyword">for</span> (SurfaceHolder.Callback c : callbacks) &#123;</span><br><span class="line">                             <span class="keyword">if</span> (c <span class="keyword">instanceof</span> SurfaceHolder.Callback2) &#123;</span><br><span class="line">                               <span class="comment">//surfaceRedrawNeeded</span></span><br><span class="line">                                 ((SurfaceHolder.Callback2)c).surfaceRedrawNeeded(</span><br><span class="line">                                         mSurfaceHolder);</span><br><span class="line">                             &#125;</span><br><span class="line">                         &#125;</span><br><span class="line">                     &#125;</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;</span><br><span class="line">       .......</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="surfaceView挖洞"><a href="#surfaceView挖洞" class="headerlink" title="surfaceView挖洞"></a>surfaceView挖洞</h2><h3 id="整体流程-1"><a href="#整体流程-1" class="headerlink" title="整体流程"></a>整体流程</h3><p><img src="/images/SurfaceView_Hold.png" alt="SurfaceView_Hold"></p>
+<h3 id="requestTransparentRegion"><a href="#requestTransparentRegion" class="headerlink" title="requestTransparentRegion"></a>requestTransparentRegion</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">requestTransparentRegion</span><span class="params">(View child)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// the test below should not fail unless someone is messing with us</span></span><br><span class="line">    checkThread();</span><br><span class="line">    <span class="keyword">if</span> (mView == child) &#123;</span><br><span class="line">      <span class="comment">//add view flag</span></span><br><span class="line">        mView.mPrivateFlags |= View.PFLAG_REQUEST_TRANSPARENT_REGIONS;</span><br><span class="line">        <span class="comment">// Need to make sure we re-evaluate the window attributes next</span></span><br><span class="line">        <span class="comment">// time around, to ensure the window has the correct format.</span></span><br><span class="line">        mWindowAttributesChanged = <span class="keyword">true</span>;</span><br><span class="line">        mWindowAttributesChangesFlag = <span class="number">0</span>;</span><br><span class="line">        requestLayout();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<!--代码在android.view.viewRootImpl类-->
+<h3 id="performTraversals-1"><a href="#performTraversals-1" class="headerlink" title="performTraversals"></a>performTraversals</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">performTraversals</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="comment">// cache mView since it is used so much below...</span></span><br><span class="line">        <span class="keyword">final</span> View host = mView;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> didLayout = mLayoutRequested;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">if</span> (didLayout) &#123;</span><br><span class="line">            ......</span><br><span class="line">            host.layout(<span class="number">0</span>, <span class="number">0</span>, host.mMeasuredWidth, host.mMeasuredHeight);</span><br><span class="line">            ......</span><br><span class="line">            <span class="keyword">if</span> ((host.mPrivateFlags &amp; View.REQUEST_TRANSPARENT_REGIONS) != <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// start out transparent</span></span><br><span class="line">                <span class="comment">// <span class="doctag">TODO:</span> AVOID THAT CALL BY CACHING THE RESULT?</span></span><br><span class="line">                host.getLocationInWindow(mTmpLocation);</span><br><span class="line">                mTransparentRegion.set(mTmpLocation[<span class="number">0</span>], mTmpLocation[<span class="number">1</span>],</span><br><span class="line">                        mTmpLocation[<span class="number">0</span>] + host.mRight - host.mLeft,</span><br><span class="line">                        mTmpLocation[<span class="number">1</span>] + host.mBottom - host.mTop);</span><br><span class="line">                host.gatherTransparentRegion(mTransparentRegion);</span><br><span class="line">                ......</span><br><span class="line">                <span class="keyword">if</span> (!mTransparentRegion.equals(mPreviousTransparentRegion)) &#123;</span><br><span class="line">                    mPreviousTransparentRegion.set(mTransparentRegion);</span><br><span class="line">                    <span class="comment">// reconfigure window manager</span></span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        sWindowSession.setTransparentRegion(mWindow, mTransparentRegion);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            ......</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">boolean</span> cancelDraw = attachInfo.mTreeObserver.dispatchOnPreDraw();</span><br><span class="line">        <span class="keyword">if</span> (!cancelDraw &amp;&amp; !newSurface) &#123;</span><br><span class="line">            ......</span><br><span class="line">            draw(fullRedrawNeeded);</span><br><span class="line">            ......</span><br><span class="line">        &#125; </span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<!--代码在android.view.viewRootImpl类-->
+<h3 id="gatherTransparentRegion"><a href="#gatherTransparentRegion" class="headerlink" title="gatherTransparentRegion"></a>gatherTransparentRegion</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">gatherTransparentRegion</span><span class="params">(Region region)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mWindowType == WindowManager.LayoutParams.TYPE_APPLICATION_PANEL) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.gatherTransparentRegion(region);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> opaque = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span> ((mPrivateFlags &amp; PFLAG_SKIP_DRAW) == <span class="number">0</span>) &#123;</span><br><span class="line">          <span class="comment">//need draw not transparent</span></span><br><span class="line">            <span class="comment">// this view draws, remove it from the transparent region</span></span><br><span class="line">            opaque = <span class="keyword">super</span>.gatherTransparentRegion(region);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (region != <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="comment">//caculate the trasparent region </span></span><br><span class="line">            <span class="keyword">int</span> w = getWidth();</span><br><span class="line">            <span class="keyword">int</span> h = getHeight();</span><br><span class="line">            <span class="keyword">if</span> (w&gt;<span class="number">0</span> &amp;&amp; h&gt;<span class="number">0</span>) &#123;</span><br><span class="line">                getLocationInWindow(mLocation);</span><br><span class="line">                <span class="comment">// otherwise, punch a hole in the whole hierarchy</span></span><br><span class="line">                <span class="keyword">int</span> l = mLocation[<span class="number">0</span>];</span><br><span class="line">                <span class="keyword">int</span> t = mLocation[<span class="number">1</span>];</span><br><span class="line">                region.op(l, t, l+w, t+h, Region.Op.UNION);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (PixelFormat.formatHasAlpha(mRequestedFormat)) &#123;</span><br><span class="line">            opaque = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> opaque;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<!--代码在android.view.SurfaceView类-->
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * This is used by the RootView to perform an optimization when</span></span><br><span class="line"><span class="comment">  * the view hierarchy contains one or several SurfaceView.</span></span><br><span class="line"><span class="comment">  * SurfaceView is always considered transparent, but its children are not,</span></span><br><span class="line"><span class="comment">  * therefore all View objects remove themselves from the global transparent</span></span><br><span class="line"><span class="comment">  * region (passed as a parameter to this function).</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> region The transparent region for this ViewAncestor (window).</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@return</span> Returns true if the effective visibility of the view at this</span></span><br><span class="line"><span class="comment">  * point is opaque, regardless of the transparent region; returns false</span></span><br><span class="line"><span class="comment">  * if it is possible for underlying windows to be seen behind the view.</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * &#123;<span class="doctag">@hide</span>&#125;</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">gatherTransparentRegion</span><span class="params">(Region region)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">final</span> AttachInfo attachInfo = mAttachInfo;</span><br><span class="line">     <span class="keyword">if</span> (region != <span class="keyword">null</span> &amp;&amp; attachInfo != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">final</span> <span class="keyword">int</span> pflags = mPrivateFlags;</span><br><span class="line">         <span class="keyword">if</span> ((pflags &amp; PFLAG_SKIP_DRAW) == <span class="number">0</span>) &#123;</span><br><span class="line">             <span class="comment">// The SKIP_DRAW flag IS NOT set, so this view draws. We need to</span></span><br><span class="line">             <span class="comment">// remove it from the transparent region.</span></span><br><span class="line">             <span class="keyword">final</span> <span class="keyword">int</span>[] location = attachInfo.mTransparentLocation;</span><br><span class="line">             getLocationInWindow(location);</span><br><span class="line">             region.op(location[<span class="number">0</span>], location[<span class="number">1</span>], location[<span class="number">0</span>] + mRight - mLeft,</span><br><span class="line">                     location[<span class="number">1</span>] + mBottom - mTop, Region.Op.DIFFERENCE);</span><br><span class="line">         &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">             <span class="keyword">if</span> (mBackground != <span class="keyword">null</span> &amp;&amp; mBackground.getOpacity() != PixelFormat.TRANSPARENT) &#123;</span><br><span class="line">                 <span class="comment">// The SKIP_DRAW flag IS set and the background drawable exists, we remove</span></span><br><span class="line">                 <span class="comment">// the background drawable's non-transparent parts from this transparent region.</span></span><br><span class="line">                 applyDrawableToTransparentRegion(mBackground, region);</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">if</span> (mForegroundInfo != <span class="keyword">null</span> &amp;&amp; mForegroundInfo.mDrawable != <span class="keyword">null</span></span><br><span class="line">                     &amp;&amp; mForegroundInfo.mDrawable.getOpacity() != PixelFormat.TRANSPARENT) &#123;</span><br><span class="line">                 <span class="comment">// Similarly, we remove the foreground drawable's non-transparent parts.</span></span><br><span class="line">                 applyDrawableToTransparentRegion(mForegroundInfo.mDrawable, region);</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<!--代码在android.view.View类-->
+<h2 id="surfaceView的绘制"><a href="#surfaceView的绘制" class="headerlink" title="surfaceView的绘制"></a>surfaceView的绘制</h2><h3 id="整体流程-2"><a href="#整体流程-2" class="headerlink" title="整体流程"></a>整体流程</h3><p><img src="/images/SurfaceView_Flow.png" alt="SurfaceView_Flow"></p>
+<h3 id="getHolder"><a href="#getHolder" class="headerlink" title="getHolder"></a>getHolder</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * Return the SurfaceHolder providing access and control over this</span></span><br><span class="line"><span class="comment">  * SurfaceView's underlying surface.</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  ##control surface</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@return</span> SurfaceHolder The holder of the surface.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> SurfaceHolder <span class="title">getHolder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="comment">//继承surfaceView的View获取holer，通过它来获取surfaceView的surface</span></span><br><span class="line">     <span class="keyword">return</span> mSurfaceHolder;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="lockCanvas"><a href="#lockCanvas" class="headerlink" title="lockCanvas"></a>lockCanvas</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SurfaceView</span> <span class="keyword">extends</span> <span class="title">View</span> </span>&#123;</span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">final</span> ReentrantLock mSurfaceLock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line">    <span class="keyword">final</span> Surface mSurface = <span class="keyword">new</span> Surface();</span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">private</span> SurfaceHolder mSurfaceHolder = <span class="keyword">new</span> SurfaceHolder() &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Canvas <span class="title">lockCanvas</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> internalLockCanvas(<span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">final</span> Canvas <span class="title">internalLockCanvas</span><span class="params">(Rect dirty)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (mType == SURFACE_TYPE_PUSH_BUFFERS) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> BadSurfaceTypeException(</span><br><span class="line">                        <span class="string">"Surface type is SURFACE_TYPE_PUSH_BUFFERS"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            mSurfaceLock.lock();</span><br><span class="line">            ......</span><br><span class="line">            Canvas c = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (!mDrawingStopped &amp;&amp; mWindow != <span class="keyword">null</span>) &#123;</span><br><span class="line">                Rect frame = dirty != <span class="keyword">null</span> ? dirty : mSurfaceFrame;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    c = mSurface.lockCanvas(frame);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    Log.e(LOG_TAG, <span class="string">"Exception locking surface"</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            ......</span><br><span class="line">            <span class="keyword">if</span> (c != <span class="keyword">null</span>) &#123;</span><br><span class="line">                mLastLockTime = SystemClock.uptimeMillis();</span><br><span class="line">                <span class="keyword">return</span> c;</span><br><span class="line">            &#125;</span><br><span class="line">            ......</span><br><span class="line">            mSurfaceLock.unlock();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;  </span><br><span class="line">        &#125; </span><br><span class="line">        ......         </span><br><span class="line">    &#125;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="unlockCanvasAndPost"><a href="#unlockCanvasAndPost" class="headerlink" title="unlockCanvasAndPost"></a>unlockCanvasAndPost</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SurfaceView</span> <span class="keyword">extends</span> <span class="title">View</span> </span>&#123;</span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">final</span> ReentrantLock mSurfaceLock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line">    <span class="keyword">final</span> Surface mSurface = <span class="keyword">new</span> Surface();</span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">private</span> SurfaceHolder mSurfaceHolder = <span class="keyword">new</span> SurfaceHolder() &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unlockCanvasAndPost</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">            mSurface.unlockCanvasAndPost(canvas);</span><br><span class="line">            mSurfaceLock.unlock();</span><br><span class="line">        &#125; </span><br><span class="line">        ......         </span><br><span class="line">    &#125;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="一般步骤"><a href="#一般步骤" class="headerlink" title="一般步骤"></a>一般步骤</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SurfaceView sv = (SurfaceView )findViewById(R.id.surface_view);</span><br><span class="line">SurfaceHolder sh = sv.getHolder();</span><br><span class="line">Cavas canvas = sh.lockCanvas()</span><br><span class="line"><span class="comment">//Draw something on canvas</span></span><br><span class="line">......</span><br><span class="line">sh.unlockCanvasAndPost(canvas);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2017/09/24/SurfaceView源码解读/" title="SurfaceView源码解读">http://jinjian.info/2017/09/24/SurfaceView源码解读/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RTFSC-Read-the-fucking-source-code/" rel="tag"># RTFSC (Read the fucking source code )</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/17/ViewRootImpl源码解读/" rel="next" title="ViewRootImpl源码解读">
+                <i class="fa fa-chevron-left"></i> ViewRootImpl源码解读
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/29/TextLayoutBuilder源码解读 /" rel="prev" title="TextLayoutBuilder源码解读">
+                TextLayoutBuilder源码解读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#surfaceView的建立"><span class="nav-number">1.</span> <span class="nav-text">surfaceView的建立</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#整体流程"><span class="nav-number">1.1.</span> <span class="nav-text">整体流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#performTraversals"><span class="nav-number">1.2.</span> <span class="nav-text">performTraversals</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dispatchAttachToWindow"><span class="nav-number">1.3.</span> <span class="nav-text">dispatchAttachToWindow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#onAttachToWindow"><span class="nav-number">1.4.</span> <span class="nav-text">onAttachToWindow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dispatchWindowVisibilityChanged"><span class="nav-number">1.5.</span> <span class="nav-text">dispatchWindowVisibilityChanged</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#onVisibilityChanged"><span class="nav-number">1.6.</span> <span class="nav-text">onVisibilityChanged</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#updateWindow"><span class="nav-number">1.6.1.</span> <span class="nav-text">updateWindow</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#surfaceView挖洞"><span class="nav-number">2.</span> <span class="nav-text">surfaceView挖洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#整体流程-1"><span class="nav-number">2.1.</span> <span class="nav-text">整体流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#requestTransparentRegion"><span class="nav-number">2.2.</span> <span class="nav-text">requestTransparentRegion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#performTraversals-1"><span class="nav-number">2.3.</span> <span class="nav-text">performTraversals</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gatherTransparentRegion"><span class="nav-number">2.4.</span> <span class="nav-text">gatherTransparentRegion</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#surfaceView的绘制"><span class="nav-number">3.</span> <span class="nav-text">surfaceView的绘制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#整体流程-2"><span class="nav-number">3.1.</span> <span class="nav-text">整体流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getHolder"><span class="nav-number">3.2.</span> <span class="nav-text">getHolder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lockCanvas"><span class="nav-number">3.3.</span> <span class="nav-text">lockCanvas</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unlockCanvasAndPost"><span class="nav-number">3.4.</span> <span class="nav-text">unlockCanvasAndPost</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一般步骤"><span class="nav-number">3.5.</span> <span class="nav-text">一般步骤</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
