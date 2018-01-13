@@ -4,7 +4,7 @@
   <url>
     <loc>http://jinjian.info/2018/01/12/%E3%80%8A%E7%A4%BE%E4%BC%9A%E5%BF%83%E7%90%86%E5%AD%A6%E3%80%8B-%E8%87%AA%E6%88%91%E8%AE%A4%E7%9F%A5/</loc>
     
-    <lastmod>2018-01-13T11:10:26.572Z</lastmod>
+    <lastmod>2018-01-13T11:11:34.654Z</lastmod>
     
   </url>
   
@@ -30,13 +30,6 @@
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/08/17/Drawable%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
-    
-    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://jinjian.info/2017/09/24/SurfaceView%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
     <lastmod>2017-12-23T19:39:18.000Z</lastmod>
@@ -51,28 +44,7 @@
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/11/18/statusBar%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
-    
-    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://jinjian.info/2017/09/10/canvas%E7%9A%84%E4%BD%BF%E7%94%A8/</loc>
-    
-    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://jinjian.info/2017/09/17/ViewRootImpl%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
-    
-    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://jinjian.info/2017/11/11/Broadcaster%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    <loc>http://jinjian.info/2017/08/17/Drawable%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
     <lastmod>2017-12-23T19:39:18.000Z</lastmod>
     
@@ -86,7 +58,35 @@
   </url>
   
   <url>
+    <loc>http://jinjian.info/2017/09/17/ViewRootImpl%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    
+    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://jinjian.info/2017/11/04/ListView%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    
+    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://jinjian.info/2017/09/10/canvas%E7%9A%84%E4%BD%BF%E7%94%A8/</loc>
+    
+    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://jinjian.info/2017/11/11/Broadcaster%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    
+    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://jinjian.info/2017/11/18/statusBar%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
     <lastmod>2017-12-23T19:39:18.000Z</lastmod>
     
