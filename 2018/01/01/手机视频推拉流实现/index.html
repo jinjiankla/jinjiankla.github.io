@@ -81,13 +81,13 @@
 
 
 
-<meta name="description" content="[TOC] 背景知识名词解释推流协议RTMPReal Time Messaging Protocol（实时消息传送协议） 使用 Flash Player 作为播放器客户端，而Flash Player 现在已经安装在了全世界将近99%的PC上，因此一般情况下收看RTMP流媒体系统的视音频是不需要安装插件的。用户只需要打开网页，就可以直接收看流媒体，十分方便  工作在TCP之上的明文协议，使用端口19">
+<meta name="description" content="背景知识名词解释推流协议RTMPReal Time Messaging Protocol（实时消息传送协议） 使用 Flash Player 作为播放器客户端，而Flash Player 现在已经安装在了全世界将近99%的PC上，因此一般情况下收看RTMP流媒体系统的视音频是不需要安装插件的。用户只需要打开网页，就可以直接收看流媒体，十分方便  工作在TCP之上的明文协议，使用端口1935；  R">
 <meta name="keywords" content="从零搭建App">
 <meta property="og:type" content="article">
 <meta property="og:title" content="移动端互动直播(入门篇)">
 <meta property="og:url" content="http://jinjian.info/2018/01/01/手机视频推拉流实现/index.html">
 <meta property="og:site_name" content="Desire 2.0">
-<meta property="og:description" content="[TOC] 背景知识名词解释推流协议RTMPReal Time Messaging Protocol（实时消息传送协议） 使用 Flash Player 作为播放器客户端，而Flash Player 现在已经安装在了全世界将近99%的PC上，因此一般情况下收看RTMP流媒体系统的视音频是不需要安装插件的。用户只需要打开网页，就可以直接收看流媒体，十分方便  工作在TCP之上的明文协议，使用端口19">
+<meta property="og:description" content="背景知识名词解释推流协议RTMPReal Time Messaging Protocol（实时消息传送协议） 使用 Flash Player 作为播放器客户端，而Flash Player 现在已经安装在了全世界将近99%的PC上，因此一般情况下收看RTMP流媒体系统的视音频是不需要安装插件的。用户只需要打开网页，就可以直接收看流媒体，十分方便  工作在TCP之上的明文协议，使用端口1935；  R">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://chuantu.biz/t6/210/1516369414x-1404764625.png">
 <meta property="og:image" content="http://chuantu.biz/t6/210/1516369232x-1404764625.png">
@@ -100,10 +100,10 @@
 <meta property="og:image" content="http://chuantu.biz/t6/211/1516534550x-1404793029.png">
 <meta property="og:image" content="http://chuantu.biz/t6/211/1516534656x-1404793029.png">
 <meta property="og:image" content="http://chuantu.biz/t6/211/1516534782x-1404793029.png">
-<meta property="og:updated_time" content="2018-01-21T11:56:50.638Z">
+<meta property="og:updated_time" content="2018-01-21T11:58:28.498Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="移动端互动直播(入门篇)">
-<meta name="twitter:description" content="[TOC] 背景知识名词解释推流协议RTMPReal Time Messaging Protocol（实时消息传送协议） 使用 Flash Player 作为播放器客户端，而Flash Player 现在已经安装在了全世界将近99%的PC上，因此一般情况下收看RTMP流媒体系统的视音频是不需要安装插件的。用户只需要打开网页，就可以直接收看流媒体，十分方便  工作在TCP之上的明文协议，使用端口19">
+<meta name="twitter:description" content="背景知识名词解释推流协议RTMPReal Time Messaging Protocol（实时消息传送协议） 使用 Flash Player 作为播放器客户端，而Flash Player 现在已经安装在了全世界将近99%的PC上，因此一般情况下收看RTMP流媒体系统的视音频是不需要安装插件的。用户只需要打开网页，就可以直接收看流媒体，十分方便  工作在TCP之上的明文协议，使用端口1935；  R">
 <meta name="twitter:image" content="http://chuantu.biz/t6/210/1516369414x-1404764625.png">
 
 
@@ -368,7 +368,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,621字
+                  1,620字
                 </span>
               
 
@@ -405,8 +405,7 @@
       
 
       
-        <p>[TOC]</p>
-<h1 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h1><h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><h3 id="推流协议"><a href="#推流协议" class="headerlink" title="推流协议"></a>推流协议</h3><h4 id="RTMP"><a href="#RTMP" class="headerlink" title="RTMP"></a>RTMP</h4><p>Real Time Messaging Protocol（实时消息传送协议）</p>
+        <h1 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h1><h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><h3 id="推流协议"><a href="#推流协议" class="headerlink" title="推流协议"></a>推流协议</h3><h4 id="RTMP"><a href="#RTMP" class="headerlink" title="RTMP"></a>RTMP</h4><p>Real Time Messaging Protocol（实时消息传送协议）</p>
 <p>使用 Flash Player 作为播放器客户端，而Flash Player 现在已经安装在了全世界将近99%的PC上，因此一般情况下收看RTMP流媒体系统的视音频是不需要安装插件的。用户只需要打开网页，就可以直接收看流媒体，十分方便</p>
 <ol>
 <li>工作在TCP之上的明文协议，使用端口1935； </li>
