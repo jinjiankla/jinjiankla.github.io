@@ -480,9 +480,9 @@
     <link href="http://jinjian.info/2017/02/10/android%E8%BD%AF%E9%94%AE%E7%9B%98%E5%BC%B9%E5%87%BA%E8%AE%BE%E8%AE%A1/"/>
     <id>http://jinjian.info/2017/02/10/android软键盘弹出设计/</id>
     <published>2017-02-09T16:00:00.000Z</published>
-    <updated>2018-02-10T10:05:34.825Z</updated>
+    <updated>2018-02-10T10:54:14.511Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="Android软键盘弹出设计"><a href="#Android软键盘弹出设计" class="headerlink" title="Android软键盘弹出设计"></a>Android软键盘弹出设计</h1><h2 id="What"><a href="#What" class="headerlink" title="What"></a>What</h2><p>根据应用场景的不同，有可能需要</p><ol><li>进入时就弹出输入框</li><li>弹出键盘时改变UI以便更好的输入交互体验</li><li>弹出键盘的时候不要遮挡下面的button按钮</li><li>弹出键盘的时候整个界面向上推起</li><li>进入是展示ui为先，当用户点击输入框再弹…</li><li>返回时候直接关闭弹出键盘</li><li>上个界面的输入框是显示的，那么点击到这个界面也需要显示.反之亦然..</li><li>……….其他各种场景</li></ol><h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><p>google针对这种种的场景,设计了这些个参数，供程序员使用</p><p><img src="/images/input_param.png" alt="softwareinputpannel"></p><h2 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h2>]]></content>
+    <content type="html"><![CDATA[<h1 id="Android软键盘弹出设计"><a href="#Android软键盘弹出设计" class="headerlink" title="Android软键盘弹出设计"></a>Android软键盘弹出设计</h1><h2 id="What"><a href="#What" class="headerlink" title="What"></a>What</h2><p>根据应用场景的不同，有可能需要</p><ol><li>进入时就弹出输入框</li><li>弹出键盘时改变UI以便更好的输入交互体验</li><li>弹出键盘的时候不要遮挡下面的button按钮</li><li>弹出键盘的时候整个界面向上推起</li><li>进入是展示ui为先，当用户点击输入框再弹…</li><li>返回时候直接关闭弹出键盘</li><li>上个界面的输入框是显示的，那么点击到这个界面也需要显示.反之亦然..</li><li>……….其他各种场景</li></ol><h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><p>google针对这种种的场景,设计了这些个参数，供程序员使用</p><p><img src="http://pic.suiyiyun.cn/598000/input_param.png" alt="softwareinputpannel"></p><h2 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h2>]]></content>
     
     <summary type="html">
     
