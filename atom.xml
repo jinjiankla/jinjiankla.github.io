@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://jinjian.info/"/>
-  <updated>2018-01-13T11:11:34.654Z</updated>
+  <updated>2018-02-17T04:07:26.033Z</updated>
   <id>http://jinjian.info/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>从零开始搭建app-outline</title>
+    <link href="http://jinjian.info/2018/02/17/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAapp%E7%B3%BB%E5%88%971/"/>
+    <id>http://jinjian.info/2018/02/17/从0开始搭建一个app系列1/</id>
+    <published>2018-02-16T16:00:00.000Z</published>
+    <updated>2018-02-17T04:07:26.033Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="从零开始搭建app-outline"><a href="#从零开始搭建app-outline" class="headerlink" title="从零开始搭建app-outline"></a>从零开始搭建app-outline</h1><p>[TOC]</p><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这是一款视频直播教育软件.</p><ol><li>提供基于LBS的找课服务</li><li>支持线上和线下两种方式的上课服务</li><li>提供多种在线互动形式 （聊天室,答题,连麦,教学白板……）</li><li>整理了完整的教学评估体系(老师学生打分体系，课后复习，课程记录……)</li></ol><h2 id="APP框架"><a href="#APP框架" class="headerlink" title="APP框架"></a>APP框架</h2><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/app_outline/app_struct.png?raw=true" alt="app_struct"></p><h2 id="设计细化"><a href="#设计细化" class="headerlink" title="设计细化"></a>设计细化</h2><p>app目标：</p><ol><li><p>搭建一个灵活易用，脱离业务，方便快速迭代的app</p></li><li><p>基于之前的工作经验，挑选合适的第三方开源库赋能，并</p><p>在这个过程中学习这些优秀开源库的设计思想(尤其是facebook 和 google的)</p></li><li><p>该app符合growth hacker的理念,能够支持快速试错，用数</p><p>据化推动产品演化路径</p></li></ol><h3 id="包结构图"><a href="#包结构图" class="headerlink" title="包结构图"></a>包结构图</h3><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/app_outline/app_package.png?raw=true" alt="app_struct"></p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> overview：</span><br><span class="line">  </span><br><span class="line">ui:          <span class="comment">// （原则上UI样式替换只需修改这一层）</span></span><br><span class="line">--Activity:  <span class="comment">// ui展示：按钮，文字，列表 etc.</span></span><br><span class="line">--IView:    <span class="comment">// present回调接口</span></span><br><span class="line">--adapter: <span class="comment">// 列表数据绑定</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">helper:</span><br><span class="line">--peresent: <span class="comment">//处理业务数据（原则上上层业务替换，修改到这一层）</span></span><br><span class="line">--util:     <span class="comment">//工具包</span></span><br><span class="line">--manager:  <span class="comment">//管理类包</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">common:</span><br><span class="line">--widget:  <span class="comment">// 封装了一些常用的视图组件</span></span><br><span class="line">--base:    <span class="comment">// network,fresco,lbslocation,EventBus,Sharedpereference,animation etc.</span></span><br><span class="line">--sdk      <span class="comment">// video,audio etc.</span></span><br></pre></td></tr></table></figure><h3 id="第三方依赖库"><a href="#第三方依赖库" class="headerlink" title="第三方依赖库"></a>第三方依赖库</h3><table><thead><tr><th style="text-align:left">依赖库</th><th style="text-align:left">说明</th></tr></thead><tbody><tr><td style="text-align:left">com.squareup.okhttp3:okhttp:3.6.0</td><td style="text-align:left">网络通信</td></tr><tr><td style="text-align:left">com.android.support:multidex:1.0.1</td><td style="text-align:left">dex分包</td></tr><tr><td style="text-align:left">com.facebook.fresco:fresco:1.1.0</td><td style="text-align:left">图片加载优化</td></tr><tr><td style="text-align:left">io.reactivex.rxjava2:rxandroid:2.0.1</td><td style="text-align:left">异步事件处理</td></tr><tr><td style="text-align:left">name: ‘CoreSDK_v1.1.1’, ext: ‘aar’</td><td style="text-align:left">日志管理：落地，打印，导出等</td></tr><tr><td style="text-align:left">org.greenrobot:eventbus:3.0.0</td><td style="text-align:left">进程内的消息传递与处理</td></tr><tr><td style="text-align:left">com.netease.nimlib:basesdk:4.4.0</td><td style="text-align:left">云信的基础功能包</td></tr><tr><td style="text-align:left">com.netease.nimlib:nrtc:4.4.0</td><td style="text-align:left">云信音视频与互动白板基础包</td></tr><tr><td style="text-align:left">com.netease.nimlib:avchat:4.4.0</td><td style="text-align:left">云信音视频包</td></tr><tr><td style="text-align:left">com.crashlytics.sdk.android:crashlytics:2.7.0@aar</td><td style="text-align:left">crash事件的收集</td></tr><tr><td style="text-align:left">com.google.gson:2.8.0</td><td style="text-align:left">java对象与json的转换</td></tr></tbody></table><h3 id="页面结构设计"><a href="#页面结构设计" class="headerlink" title="页面结构设计"></a>页面结构设计</h3><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/app_outline/app_mainpage.png?raw=true" alt="app_struct"></p><h3 id="直播结构设计"><a href="#直播结构设计" class="headerlink" title="直播结构设计"></a>直播结构设计</h3><p>采用app组件化的方式，赋能app直播在线教育的功能</p><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/app_outline/app_livebroad.png?raw=true" alt="app_struct"></p><h4 id="教师端和学生端的协议设计"><a href="#教师端和学生端的协议设计" class="headerlink" title="教师端和学生端的协议设计"></a>教师端和学生端的协议设计</h4><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/app_outline/app_protocal.png?raw=true" alt="app_struct"></p><h2 id="开源框架解读"><a href="#开源框架解读" class="headerlink" title="开源框架解读"></a>开源框架解读</h2><ul><li>RxJava</li><li>SimpleDrawee</li><li>EventBus </li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;从零开始搭建app-outline&quot;&gt;&lt;a href=&quot;#从零开始搭建app-outline&quot; class=&quot;headerlink&quot; title=&quot;从零开始搭建app-outline&quot;&gt;&lt;/a&gt;从零开始搭建app-outline&lt;/h1&gt;&lt;p&gt;[TOC]&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+      <category term="从零搭建App" scheme="http://jinjian.info/categories/%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BAApp/"/>
+    
+    
+      <category term="从零搭建App" scheme="http://jinjian.info/tags/%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BAApp/"/>
+    
+  </entry>
   
   <entry>
     <title>《社会心理学》自我认知篇</title>

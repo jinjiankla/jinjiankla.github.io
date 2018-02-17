@@ -274,6 +274,185 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2017/10/29/TextLayoutBuilder源码解读 /">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire 2.0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/29/TextLayoutBuilder源码解读 /" itemprop="url">TextLayoutBuilder源码解读</a></h1>
+        
+
+        <div class="post-meta">
+         
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-29T00:00:00+08:00">
+                2017-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读别人的源码，涨自己的智慧/" itemprop="url" rel="index">
+                    <span itemprop="name">读别人的源码，涨自己的智慧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+  
+
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,113字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  24分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          原理背景Canvas在drawText的时候，如果需要每次都计算字体的大小,边距之类的话，就会非常耗时，导致drawText时间会拉的很长，为了提高效率，android4.0之后引入了TextLayoutCache,使用了LRU缓存了字型，边距等数据，提升了drawText的速度，在4.4中,这个cache的大小是0.5m，全局使用，并且受到系统的控制会在Activity的configurationChanged, onResume, lowMemory, updateVisibility等时机，会调用Canvas.freeTextLayoutCache来释放这部分内存
+12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758// /frameworks/minikin/libs/minikin/Layout.cpp中的Layout
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/10/29/TextLayoutBuilder源码解读 /#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://jinjian.info/2017/09/24/SurfaceView源码解读/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1994,7 +2173,7 @@ Why
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
