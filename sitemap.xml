@@ -4,7 +4,7 @@
   <url>
     <loc>http://jinjian.info/about/index.html</loc>
     
-    <lastmod>2018-03-10T12:19:06.757Z</lastmod>
+    <lastmod>2018-03-10T12:23:37.289Z</lastmod>
     
   </url>
   
@@ -58,20 +58,6 @@
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/11/11/Broadcaster%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
-    
-    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://jinjian.info/2017/11/04/ListView%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
-    
-    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://jinjian.info/2017/10/29/TextLayoutBuilder%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%20/</loc>
     
     <lastmod>2017-12-23T19:39:18.000Z</lastmod>
@@ -86,13 +72,6 @@
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/11/18/statusBar%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
-    
-    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://jinjian.info/2017/11/25/Service%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
     <lastmod>2017-12-23T19:39:18.000Z</lastmod>
@@ -100,14 +79,35 @@
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/08/17/Drawable%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    <loc>http://jinjian.info/2017/09/10/canvas%E7%9A%84%E4%BD%BF%E7%94%A8/</loc>
     
     <lastmod>2017-12-23T19:39:18.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/09/10/canvas%E7%9A%84%E4%BD%BF%E7%94%A8/</loc>
+    <loc>http://jinjian.info/2017/11/04/ListView%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    
+    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://jinjian.info/2017/11/11/Broadcaster%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    
+    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://jinjian.info/2017/11/18/statusBar%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    
+    <lastmod>2017-12-23T19:39:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://jinjian.info/2017/08/17/Drawable%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
     <lastmod>2017-12-23T19:39:18.000Z</lastmod>
     
@@ -135,14 +135,14 @@
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/11/05/ImageView%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    <loc>http://jinjian.info/2017/08/13/ViewGroup%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
     <lastmod>2017-12-23T17:50:54.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://jinjian.info/2017/08/13/ViewGroup%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
+    <loc>http://jinjian.info/2017/11/05/ImageView%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
     <lastmod>2017-12-23T17:50:54.000Z</lastmod>
     
