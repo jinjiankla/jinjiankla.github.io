@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://jinjian.info/"/>
-  <updated>2018-02-17T04:07:26.033Z</updated>
+  <updated>2018-04-29T13:32:34.053Z</updated>
   <id>http://jinjian.info/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>直播问题排查方法</title>
+    <link href="http://jinjian.info/2018/04/28/%E7%9B%B4%E6%92%AD%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E6%96%B9%E6%B3%95/"/>
+    <id>http://jinjian.info/2018/04/28/直播问题排查方法/</id>
+    <published>2018-04-27T16:00:00.000Z</published>
+    <updated>2018-04-29T13:32:34.053Z</updated>
+    
+    <content type="html"><![CDATA[<p>[TOC]</p><h1 id="影响直播效果的因素"><a href="#影响直播效果的因素" class="headerlink" title="影响直播效果的因素"></a>影响直播效果的因素</h1><h2 id="非技术排错"><a href="#非技术排错" class="headerlink" title="非技术排错"></a>非技术排错</h2><ul><li>连麦没声音</li></ul><ol><li>手机硬件（尝试微信可以语音是否可以发消息） x</li><li>权限 (判断麦克风权限是否已打开) x</li><li>网络 （尝试4g和wifi下的运行效果是否一致）x</li><li>程序bug  </li></ol><p>​     4.1 (引导用户退出房间再重新进入) x</p><ul><li><p>突来的卡顿</p><p>通过影响范围判断：</p><ol><li>主播端网络不好，直接影响到的就是千千万万的观众，因此，如果发现所有的观众都出现频繁卡顿，那么多半就是主播端的问题了</li><li>某个用户网络不好.</li></ol></li></ul><h2 id="技术排错"><a href="#技术排错" class="headerlink" title="技术排错"></a>技术排错</h2><h3 id="存在角色"><a href="#存在角色" class="headerlink" title="存在角色"></a>存在角色</h3><h4 id="主播"><a href="#主播" class="headerlink" title="主播"></a>主播</h4><ol><li>主播设置的音视频参数</li><li>上行带宽</li><li>wifi出现问题的情况下，建议尝试使用有线推流。</li></ol><h4 id="观众"><a href="#观众" class="headerlink" title="观众"></a>观众</h4><ol><li>选择的播放协议</li></ol><h4 id="主播-观众设备"><a href="#主播-观众设备" class="headerlink" title="主播/观众设备"></a>主播/观众设备</h4><ol><li>硬件性能和编解码能力</li><li>双方网络的运营商，是否跨运营商连接或者二级运营商。</li></ol><h3 id="推流分辨率和带宽关系"><a href="#推流分辨率和带宽关系" class="headerlink" title="推流分辨率和带宽关系"></a>推流分辨率和带宽关系</h3><p>如果设置的码率（带宽）过低，则无法保证传输的视频质量；<br>如果设置的码率（带宽）过高，则对网络带宽质量要求较高。<br>建议的对应关系如下：</p><table><thead><tr><th>编码分辨率和帧率</th><th>码率</th><th>示例</th></tr></thead><tbody><tr><td>1280*720@20fps</td><td>1500kbps</td><td>Android推流Demo，HD</td></tr><tr><td>960*720@20fps</td><td>1000kbps</td><td></td></tr><tr><td>960*540@20fps</td><td>800kbps</td><td></td></tr><tr><td>960*540@15fps</td><td>650kbps</td><td>iOS推流Demo，LS_VIDEO_QUALITY_SUPER</td></tr><tr><td>640*480@20fps</td><td>600kbps</td><td>Android推流Demo，SD</td></tr><tr><td>640*480@15fps</td><td>500kbps</td><td>iOS推流Demo，LS_VIDEO_QUALITY_HIGH</td></tr><tr><td>640*360@20fps</td><td>500kbps</td><td></td></tr><tr><td>480*360@15fps</td><td>300kbps</td><td>iOS推流Demo，LS_VIDEO_QUALITY_MEDIUM</td></tr><tr><td>320*240@15fps</td><td>250kbps</td><td>Android推流Demo，Fluency</td></tr></tbody></table><h3 id="人数限制"><a href="#人数限制" class="headerlink" title="人数限制"></a>人数限制</h3><p>主播加入互动直播房间时需要使用推流地址进行直播，连麦者不需要使用推流和拉流地址，观众需要使用主播同一个频道下与其推流地址对应的拉流地址进行观看</p><ul><li>目前互动直播房间支持1个主播和最多4个连麦者（1+4）进行音视频连麦，聊天室支持的观众数没有限制</li><li>目前互动直播房间支持最多13人(1主播+12连麦者)进行纯音频连麦互动</li><li>对纯音频连麦者进行静音与非静音的操作，他们都仍然算在12个连麦者名额当中</li><li>如果人数超出限制，需要当前连麦的用户先退出房间</li></ul><h3 id="播放延时"><a href="#播放延时" class="headerlink" title="播放延时"></a>播放延时</h3><h4 id="影响因素"><a href="#影响因素" class="headerlink" title="影响因素"></a>影响因素</h4><ol><li>无法避免的网络延时计算。主播与观众的物理距离,用 200,000km/s 计算往返延时。</li><li>网络抖动 。比如27号数据包到83号才到达。</li><li>网络丢包。</li></ol><h4 id="影响原理"><a href="#影响原理" class="headerlink" title="影响原理"></a>影响原理</h4><p>业务代码中的缓冲区</p><p>业务代码中的缓冲区，主要是推流端的缓冲区和播放端的缓冲区，一个 30 fps 的视频流，缓冲区每滞留 30 帧，延时就会增大 1s，那么，它们是怎么产生缓冲数据的呢 ？</p><h5 id="推流端的数据怎么「积累」起来的呢-？"><a href="#推流端的数据怎么「积累」起来的呢-？" class="headerlink" title="推流端的数据怎么「积累」起来的呢 ？"></a>推流端的数据怎么「积累」起来的呢 ？</h5><p>采集 -&gt; 编码 -&gt; 数据发送 -&gt; [服务器] 当网络产生抖动的时候，「数据发送」会因此减慢，产生一定的阻塞，从而导致这些数据会被 「积累」在了推流端的发送缓冲区中。</p><h5 id="播放端的数据怎么-「积累」起来的呢-？"><a href="#播放端的数据怎么-「积累」起来的呢-？" class="headerlink" title="播放端的数据怎么 「积累」起来的呢 ？"></a>播放端的数据怎么 「积累」起来的呢 ？</h5><p>[服务器]-&gt; 数据接收 -&gt; 解码 -&gt; 渲染 当网络产生抖动的时候，服务器的数据无法「及时」地传输到播放端，而由于 TCP 协议的可靠性，所有的数据都会被服务端积累起来，在网络恢复良好的时候，会快速传输到播放端，这些数据会被动地 「积累」在接收缓冲区中。</p><h5 id="怎么消除业务缓冲区的累计延时呢-？"><a href="#怎么消除业务缓冲区的累计延时呢-？" class="headerlink" title="怎么消除业务缓冲区的累计延时呢 ？"></a>怎么消除业务缓冲区的累计延时呢 ？</h5><p>推流端的发送缓冲区，可以在网络恢复良好的时候，快送发送出去，从而消除掉这个累计延时。</p><p>播放端的接收缓冲区，可以通过丢帧或者加速播放的方式快速消费掉缓冲区中的数据，从而消除累计延时。</p><h4 id="连麦方式"><a href="#连麦方式" class="headerlink" title="连麦方式"></a>连麦方式</h4><ul><li>RTMP 多路合流到CDN变成一路下发【cdn合成】</li><li>主播端与连麦者P2P,然后主播把合流推送到CDN上面再发送给观众。【主播端合成】</li><li>RTMP多路推到CDN,CDN再把这几路流都推给观众端【观众端合成】</li></ul><h4 id="直播功耗高"><a href="#直播功耗高" class="headerlink" title="直播功耗高"></a>直播功耗高</h4><p>导致手机功耗高，发热严重的根本因素，无外乎就是一点：CPU/GPU 占用率高，所以，我们首先要分析下，哪些因素会导致 CPU/GPU 占用率高</p><ol><li>大量的格式转换</li><li>数据量太大视频的尺寸（例如：1280 x 720 的图像，明显要比 320 x 240 的图像处理起来费劲）视频的帧率（例如：每秒 30 帧，明显要比每秒 15 帧，处理起来费劲</li><li>对图像进行放大操作,图像的缩小或者剪裁，同样也会消耗一定的 CPU，只不过相比于图片放大要好点</li><li>软编/软解靠的是 CPU，非常耗性能，而硬编/硬解是使用专门的硬件编解码器模块，会显著降低 CPU 的负担，相对而言，会省电很多</li></ol><h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ol><li>云信提供了一个辅助的网络情况测试工具 AVChatNetDetectType，它可以探测音视频通话网络的连通性、丢包率和延迟等信息</li></ol><ol><li><p>pc主播的网络检测。speedTest //123.58.160.153浙江省杭州市 电信 </p></li><li><p>观众使用的网络情况可以通过AVChatNetDetectType监测。</p></li><li><p>声音大小回调提示 ,可以通过AVChatStateObserver中的onReportSpeaker方法获得。</p></li><li><p>主播端网络不好,直接影响到的就是千千万万的观众，因此，如果发现所有的观众都出现频繁卡顿，那么多半就是主播端的问题了</p><ol><li><p>主播端： Speedtest,统计回调，cdn厂商给出的后台统计</p></li><li><p>观众端：speedTest，ping 域名，获得丢包率 -&gt; iperf -&gt; control c</p></li></ol></li><li><p>设备性能 带宽越高对解码要求越高，特别对720p和1080p。</p><ul><li>尽可能选择使用硬解，充分利用 GPU 加速</li><li>如果有多种码流，尽可能在低端机上选择非高清码流</li><li>增大缓冲区，有助于缓解解码不稳定带来的卡顿</li></ul></li><li><p>云信提供了直播实时转码功能，支持不同分辨率、码率的拉流地址供客户自行选择</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">//云信提供回调方法</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNetworkQuality</span><span class="params">(String s, <span class="keyword">int</span> i, AVChatNetworkStats avChatNetworkStats)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (i == <span class="number">0</span> || i == <span class="number">1</span>) &#123;</span><br><span class="line"><span class="comment">//网络状态好的时候选择清晰度优先。 在此模式下会优先保证视频的清晰度, 网络不稳定时会优先降低帧率来保证视频的清晰度</span></span><br><span class="line">            AVChatManager.getInstance().setVideoQualityStrategy(AVChatVideoQualityStrategy.PreferImageQuality);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//网络状态不好的时候选择流畅优先。 在此模式下会优先保证视频的流畅度, 网络不稳定是会优先降低视频分辨率来保证视频的流程度</span></span><br><span class="line">            AVChatManager.getInstance().setVideoQualityStrategy(AVChatVideoQualityStrategy.PreferFrameRate);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure><p>​</p></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;[TOC]&lt;/p&gt;
+&lt;h1 id=&quot;影响直播效果的因素&quot;&gt;&lt;a href=&quot;#影响直播效果的因素&quot; class=&quot;headerlink&quot; title=&quot;影响直播效果的因素&quot;&gt;&lt;/a&gt;影响直播效果的因素&lt;/h1&gt;&lt;h2 id=&quot;非技术排错&quot;&gt;&lt;a href=&quot;#非技术排错&quot; 
+      
+    
+    </summary>
+    
+      <category term="从零搭建App" scheme="http://jinjian.info/categories/%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BAApp/"/>
+    
+    
+      <category term="从零搭建App" scheme="http://jinjian.info/tags/%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BAApp/"/>
+    
+  </entry>
   
   <entry>
     <title>从零开始搭建app-outline</title>
@@ -500,31 +526,6 @@
     
     
       <category term="Confluence" scheme="http://jinjian.info/tags/Confluence/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Android软键盘弹出设计</title>
-    <link href="http://jinjian.info/2017/02/10/android%E8%BD%AF%E9%94%AE%E7%9B%98%E5%BC%B9%E5%87%BA%E8%AE%BE%E8%AE%A1/"/>
-    <id>http://jinjian.info/2017/02/10/android软键盘弹出设计/</id>
-    <published>2017-02-09T16:00:00.000Z</published>
-    <updated>2018-03-04T05:32:42.406Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="Android软键盘弹出设计"><a href="#Android软键盘弹出设计" class="headerlink" title="Android软键盘弹出设计"></a>Android软键盘弹出设计</h1><h2 id="What"><a href="#What" class="headerlink" title="What"></a>What</h2><p>根据应用场景的不同，有可能需要</p><ol><li>进入时就弹出输入框</li><li>弹出键盘时改变UI以便更好的输入交互体验</li><li>弹出键盘的时候不要遮挡下面的button按钮</li><li>弹出键盘的时候整个界面向上推起</li><li>进入是展示ui为先，当用户点击输入框再弹…</li><li>返回时候直接关闭弹出键盘</li><li>上个界面的输入框是显示的，那么点击到这个界面也需要显示.反之亦然..</li><li>……….其他各种场景</li></ol><h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><p>google针对这种种的场景,设计了这些个参数，供程序员使用</p><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/inputMethod/input_param.png?raw=true" alt="softwareinputpannel"></p><h2 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h2>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;Android软键盘弹出设计&quot;&gt;&lt;a href=&quot;#Android软键盘弹出设计&quot; class=&quot;headerlink&quot; title=&quot;Android软键盘弹出设计&quot;&gt;&lt;/a&gt;Android软键盘弹出设计&lt;/h1&gt;&lt;h2 id=&quot;What&quot;&gt;&lt;a href=&quot;#W
-      
-    
-    </summary>
-    
-      <category term="Android小知识" scheme="http://jinjian.info/categories/Android%E5%B0%8F%E7%9F%A5%E8%AF%86/"/>
-    
-    
-      <category term="Android小知识" scheme="http://jinjian.info/tags/Android%E5%B0%8F%E7%9F%A5%E8%AF%86/"/>
     
   </entry>
   

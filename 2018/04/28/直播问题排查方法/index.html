@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="从零搭建App," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire 2.0" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="[TOC] 影响直播效果的因素非技术排错 连麦没声音   手机硬件（尝试微信可以语音是否可以发消息） x 权限 (判断麦克风权限是否已打开) x 网络 （尝试4g和wifi下的运行效果是否一致）x 程序bug    ​     4.1 (引导用户退出房间再重新进入) x  突来的卡顿 通过影响范围判断：  主播端网络不好，直接影响到的就是千千万万的观众，因此，如果发现所有的观众都出现频繁卡顿，那么">
+<meta name="keywords" content="从零搭建App">
+<meta property="og:type" content="article">
+<meta property="og:title" content="直播问题排查方法">
+<meta property="og:url" content="http://jinjian.info/2018/04/28/直播问题排查方法/index.html">
+<meta property="og:site_name" content="Desire 2.0">
+<meta property="og:description" content="[TOC] 影响直播效果的因素非技术排错 连麦没声音   手机硬件（尝试微信可以语音是否可以发消息） x 权限 (判断麦克风权限是否已打开) x 网络 （尝试4g和wifi下的运行效果是否一致）x 程序bug    ​     4.1 (引导用户退出房间再重新进入) x  突来的卡顿 通过影响范围判断：  主播端网络不好，直接影响到的就是千千万万的观众，因此，如果发现所有的观众都出现频繁卡顿，那么">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-04-29T13:32:34.053Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="直播问题排查方法">
+<meta name="twitter:description" content="[TOC] 影响直播效果的因素非技术排错 连麦没声音   手机硬件（尝试微信可以语音是否可以发消息） x 权限 (判断麦克风权限是否已打开) x 网络 （尝试4g和wifi下的运行效果是否一致）x 程序bug    ​     4.1 (引导用户退出房间再重新进入) x  突来的卡顿 通过影响范围判断：  主播端网络不好，直接影响到的就是千千万万的观众，因此，如果发现所有的观众都出现频繁卡顿，那么">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2018/04/28/直播问题排查方法/"/>
+
+
+
+
+
+  <title>直播问题排查方法 | Desire 2.0</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire 2.0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2018/04/28/直播问题排查方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire 2.0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">直播问题排查方法</h1>
+        
+
+        <div class="post-meta">
+         
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-28T00:00:00+08:00">
+                2018-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/从零搭建App/" itemprop="url" rel="index">
+                    <span itemprop="name">从零搭建App</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+  
+
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,765字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>[TOC]</p>
+<h1 id="影响直播效果的因素"><a href="#影响直播效果的因素" class="headerlink" title="影响直播效果的因素"></a>影响直播效果的因素</h1><h2 id="非技术排错"><a href="#非技术排错" class="headerlink" title="非技术排错"></a>非技术排错</h2><ul>
+<li>连麦没声音</li>
+</ul>
+<ol>
+<li>手机硬件（尝试微信可以语音是否可以发消息） x</li>
+<li>权限 (判断麦克风权限是否已打开) x</li>
+<li>网络 （尝试4g和wifi下的运行效果是否一致）x</li>
+<li>程序bug  </li>
+</ol>
+<p>​     4.1 (引导用户退出房间再重新进入) x</p>
+<ul>
+<li><p>突来的卡顿</p>
+<p>通过影响范围判断：</p>
+<ol>
+<li>主播端网络不好，直接影响到的就是千千万万的观众，因此，如果发现所有的观众都出现频繁卡顿，那么多半就是主播端的问题了</li>
+<li>某个用户网络不好.</li>
+</ol>
+</li>
+</ul>
+<h2 id="技术排错"><a href="#技术排错" class="headerlink" title="技术排错"></a>技术排错</h2><h3 id="存在角色"><a href="#存在角色" class="headerlink" title="存在角色"></a>存在角色</h3><h4 id="主播"><a href="#主播" class="headerlink" title="主播"></a>主播</h4><ol>
+<li>主播设置的音视频参数</li>
+<li>上行带宽</li>
+<li>wifi出现问题的情况下，建议尝试使用有线推流。</li>
+</ol>
+<h4 id="观众"><a href="#观众" class="headerlink" title="观众"></a>观众</h4><ol>
+<li>选择的播放协议</li>
+</ol>
+<h4 id="主播-观众设备"><a href="#主播-观众设备" class="headerlink" title="主播/观众设备"></a>主播/观众设备</h4><ol>
+<li>硬件性能和编解码能力</li>
+<li>双方网络的运营商，是否跨运营商连接或者二级运营商。</li>
+</ol>
+<h3 id="推流分辨率和带宽关系"><a href="#推流分辨率和带宽关系" class="headerlink" title="推流分辨率和带宽关系"></a>推流分辨率和带宽关系</h3><p>如果设置的码率（带宽）过低，则无法保证传输的视频质量；<br>如果设置的码率（带宽）过高，则对网络带宽质量要求较高。<br>建议的对应关系如下：</p>
+<table>
+<thead>
+<tr>
+<th>编码分辨率和帧率</th>
+<th>码率</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1280*720@20fps</td>
+<td>1500kbps</td>
+<td>Android推流Demo，HD</td>
+</tr>
+<tr>
+<td>960*720@20fps</td>
+<td>1000kbps</td>
+<td></td>
+</tr>
+<tr>
+<td>960*540@20fps</td>
+<td>800kbps</td>
+<td></td>
+</tr>
+<tr>
+<td>960*540@15fps</td>
+<td>650kbps</td>
+<td>iOS推流Demo，LS_VIDEO_QUALITY_SUPER</td>
+</tr>
+<tr>
+<td>640*480@20fps</td>
+<td>600kbps</td>
+<td>Android推流Demo，SD</td>
+</tr>
+<tr>
+<td>640*480@15fps</td>
+<td>500kbps</td>
+<td>iOS推流Demo，LS_VIDEO_QUALITY_HIGH</td>
+</tr>
+<tr>
+<td>640*360@20fps</td>
+<td>500kbps</td>
+<td></td>
+</tr>
+<tr>
+<td>480*360@15fps</td>
+<td>300kbps</td>
+<td>iOS推流Demo，LS_VIDEO_QUALITY_MEDIUM</td>
+</tr>
+<tr>
+<td>320*240@15fps</td>
+<td>250kbps</td>
+<td>Android推流Demo，Fluency</td>
+</tr>
+</tbody>
+</table>
+<h3 id="人数限制"><a href="#人数限制" class="headerlink" title="人数限制"></a>人数限制</h3><p>主播加入互动直播房间时需要使用推流地址进行直播，连麦者不需要使用推流和拉流地址，观众需要使用主播同一个频道下与其推流地址对应的拉流地址进行观看</p>
+<ul>
+<li>目前互动直播房间支持1个主播和最多4个连麦者（1+4）进行音视频连麦，聊天室支持的观众数没有限制</li>
+<li>目前互动直播房间支持最多13人(1主播+12连麦者)进行纯音频连麦互动</li>
+<li>对纯音频连麦者进行静音与非静音的操作，他们都仍然算在12个连麦者名额当中</li>
+<li>如果人数超出限制，需要当前连麦的用户先退出房间</li>
+</ul>
+<h3 id="播放延时"><a href="#播放延时" class="headerlink" title="播放延时"></a>播放延时</h3><h4 id="影响因素"><a href="#影响因素" class="headerlink" title="影响因素"></a>影响因素</h4><ol>
+<li>无法避免的网络延时计算。主播与观众的物理距离,用 200,000km/s 计算往返延时。</li>
+<li>网络抖动 。比如27号数据包到83号才到达。</li>
+<li>网络丢包。</li>
+</ol>
+<h4 id="影响原理"><a href="#影响原理" class="headerlink" title="影响原理"></a>影响原理</h4><p>业务代码中的缓冲区</p>
+<p>业务代码中的缓冲区，主要是推流端的缓冲区和播放端的缓冲区，一个 30 fps 的视频流，缓冲区每滞留 30 帧，延时就会增大 1s，那么，它们是怎么产生缓冲数据的呢 ？</p>
+<h5 id="推流端的数据怎么「积累」起来的呢-？"><a href="#推流端的数据怎么「积累」起来的呢-？" class="headerlink" title="推流端的数据怎么「积累」起来的呢 ？"></a>推流端的数据怎么「积累」起来的呢 ？</h5><p>采集 -&gt; 编码 -&gt; 数据发送 -&gt; [服务器] 当网络产生抖动的时候，「数据发送」会因此减慢，产生一定的阻塞，从而导致这些数据会被 「积累」在了推流端的发送缓冲区中。</p>
+<h5 id="播放端的数据怎么-「积累」起来的呢-？"><a href="#播放端的数据怎么-「积累」起来的呢-？" class="headerlink" title="播放端的数据怎么 「积累」起来的呢 ？"></a>播放端的数据怎么 「积累」起来的呢 ？</h5><p>[服务器]-&gt; 数据接收 -&gt; 解码 -&gt; 渲染 当网络产生抖动的时候，服务器的数据无法「及时」地传输到播放端，而由于 TCP 协议的可靠性，所有的数据都会被服务端积累起来，在网络恢复良好的时候，会快速传输到播放端，这些数据会被动地 「积累」在接收缓冲区中。</p>
+<h5 id="怎么消除业务缓冲区的累计延时呢-？"><a href="#怎么消除业务缓冲区的累计延时呢-？" class="headerlink" title="怎么消除业务缓冲区的累计延时呢 ？"></a>怎么消除业务缓冲区的累计延时呢 ？</h5><p>推流端的发送缓冲区，可以在网络恢复良好的时候，快送发送出去，从而消除掉这个累计延时。</p>
+<p>播放端的接收缓冲区，可以通过丢帧或者加速播放的方式快速消费掉缓冲区中的数据，从而消除累计延时。</p>
+<h4 id="连麦方式"><a href="#连麦方式" class="headerlink" title="连麦方式"></a>连麦方式</h4><ul>
+<li>RTMP 多路合流到CDN变成一路下发【cdn合成】</li>
+<li>主播端与连麦者P2P,然后主播把合流推送到CDN上面再发送给观众。【主播端合成】</li>
+<li>RTMP多路推到CDN,CDN再把这几路流都推给观众端【观众端合成】</li>
+</ul>
+<h4 id="直播功耗高"><a href="#直播功耗高" class="headerlink" title="直播功耗高"></a>直播功耗高</h4><p>导致手机功耗高，发热严重的根本因素，无外乎就是一点：CPU/GPU 占用率高，所以，我们首先要分析下，哪些因素会导致 CPU/GPU 占用率高</p>
+<ol>
+<li>大量的格式转换</li>
+<li>数据量太大视频的尺寸（例如：1280 x 720 的图像，明显要比 320 x 240 的图像处理起来费劲）视频的帧率（例如：每秒 30 帧，明显要比每秒 15 帧，处理起来费劲</li>
+<li>对图像进行放大操作,图像的缩小或者剪裁，同样也会消耗一定的 CPU，只不过相比于图片放大要好点</li>
+<li>软编/软解靠的是 CPU，非常耗性能，而硬编/硬解是使用专门的硬件编解码器模块，会显著降低 CPU 的负担，相对而言，会省电很多</li>
+</ol>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ol>
+<li>云信提供了一个辅助的网络情况测试工具 AVChatNetDetectType，它可以探测音视频通话网络的连通性、丢包率和延迟等信息</li>
+</ol>
+<ol>
+<li><p>pc主播的网络检测。speedTest //123.58.160.153浙江省杭州市 电信 </p>
+</li>
+<li><p>观众使用的网络情况可以通过AVChatNetDetectType监测。</p>
+</li>
+<li><p>声音大小回调提示 ,可以通过AVChatStateObserver中的onReportSpeaker方法获得。</p>
+</li>
+<li><p>主播端网络不好,直接影响到的就是千千万万的观众，因此，如果发现所有的观众都出现频繁卡顿，那么多半就是主播端的问题了</p>
+<ol>
+<li><p>主播端： Speedtest,统计回调，cdn厂商给出的后台统计</p>
+</li>
+<li><p>观众端：speedTest，ping 域名，获得丢包率 -&gt; iperf -&gt; control c</p>
+</li>
+</ol>
+</li>
+<li><p>设备性能 带宽越高对解码要求越高，特别对720p和1080p。</p>
+<ul>
+<li>尽可能选择使用硬解，充分利用 GPU 加速</li>
+<li>如果有多种码流，尽可能在低端机上选择非高清码流</li>
+<li>增大缓冲区，有助于缓解解码不稳定带来的卡顿</li>
+</ul>
+</li>
+<li><p>云信提供了直播实时转码功能，支持不同分辨率、码率的拉流地址供客户自行选择</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">//云信提供回调方法</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNetworkQuality</span><span class="params">(String s, <span class="keyword">int</span> i, AVChatNetworkStats avChatNetworkStats)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (i == <span class="number">0</span> || i == <span class="number">1</span>) &#123;</span><br><span class="line"><span class="comment">//网络状态好的时候选择清晰度优先。 在此模式下会优先保证视频的清晰度, 网络不稳定时会优先降低帧率来保证视频的清晰度</span></span><br><span class="line">            AVChatManager.getInstance().setVideoQualityStrategy(AVChatVideoQualityStrategy.PreferImageQuality);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//网络状态不好的时候选择流畅优先。 在此模式下会优先保证视频的流畅度, 网络不稳定是会优先降低视频分辨率来保证视频的流程度</span></span><br><span class="line">            AVChatManager.getInstance().setVideoQualityStrategy(AVChatVideoQualityStrategy.PreferFrameRate);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2018/04/28/直播问题排查方法/" title="直播问题排查方法">http://jinjian.info/2018/04/28/直播问题排查方法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/从零搭建App/" rel="tag"># 从零搭建App</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/17/从0开始搭建一个app系列1/" rel="next" title="从零开始搭建app-outline">
+                <i class="fa fa-chevron-left"></i> 从零开始搭建app-outline
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#影响直播效果的因素"><span class="nav-number">1.</span> <span class="nav-text">影响直播效果的因素</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#非技术排错"><span class="nav-number">1.1.</span> <span class="nav-text">非技术排错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术排错"><span class="nav-number">1.2.</span> <span class="nav-text">技术排错</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#存在角色"><span class="nav-number">1.2.1.</span> <span class="nav-text">存在角色</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#主播"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">主播</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#观众"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">观众</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主播-观众设备"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">主播/观众设备</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#推流分辨率和带宽关系"><span class="nav-number">1.2.2.</span> <span class="nav-text">推流分辨率和带宽关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#人数限制"><span class="nav-number">1.2.3.</span> <span class="nav-text">人数限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#播放延时"><span class="nav-number">1.2.4.</span> <span class="nav-text">播放延时</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#影响因素"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">影响因素</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#影响原理"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">影响原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#推流端的数据怎么「积累」起来的呢-？"><span class="nav-number">1.2.4.2.1.</span> <span class="nav-text">推流端的数据怎么「积累」起来的呢 ？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#播放端的数据怎么-「积累」起来的呢-？"><span class="nav-number">1.2.4.2.2.</span> <span class="nav-text">播放端的数据怎么 「积累」起来的呢 ？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#怎么消除业务缓冲区的累计延时呢-？"><span class="nav-number">1.2.4.2.3.</span> <span class="nav-text">怎么消除业务缓冲区的累计延时呢 ？</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#连麦方式"><span class="nav-number">1.2.4.3.</span> <span class="nav-text">连麦方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#直播功耗高"><span class="nav-number">1.2.4.4.</span> <span class="nav-text">直播功耗高</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他"><span class="nav-number">1.2.4.5.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
