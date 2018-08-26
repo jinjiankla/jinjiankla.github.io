@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="RTFSC (Read the fucking source code )," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="HorizontalListView源码解读[TOC] 前言​    随着RecycleView进入人们的视野，其强大的功能让人们逐渐忘记了曾经的王者”AdapterView”,但这绝不影响它对我们的吸引力，要知道当年流行的Gallery，Spinner，ListView，GridView等等都是它的孩子。 ​    那么，假如今天我们要在它的孩子中增加一个横向滚动控件，我们应该怎么实现呢？Hor">
+<meta name="keywords" content="RTFSC (Read the fucking source code )">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HorizontalListView源码解读">
+<meta property="og:url" content="http://jinjian.info/2018/08/25/HorizontalListView源码解读/index.html">
+<meta property="og:site_name" content="Desire">
+<meta property="og:description" content="HorizontalListView源码解读[TOC] 前言​    随着RecycleView进入人们的视野，其强大的功能让人们逐渐忘记了曾经的王者”AdapterView”,但这绝不影响它对我们的吸引力，要知道当年流行的Gallery，Spinner，ListView，GridView等等都是它的孩子。 ​    那么，假如今天我们要在它的孩子中增加一个横向滚动控件，我们应该怎么实现呢？Hor">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-26T07:20:16.354Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HorizontalListView源码解读">
+<meta name="twitter:description" content="HorizontalListView源码解读[TOC] 前言​    随着RecycleView进入人们的视野，其强大的功能让人们逐渐忘记了曾经的王者”AdapterView”,但这绝不影响它对我们的吸引力，要知道当年流行的Gallery，Spinner，ListView，GridView等等都是它的孩子。 ​    那么，假如今天我们要在它的孩子中增加一个横向滚动控件，我们应该怎么实现呢？Hor">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2018/08/25/HorizontalListView源码解读/"/>
+
+
+
+
+
+  <title>HorizontalListView源码解读 | Desire</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2018/08/25/HorizontalListView源码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HorizontalListView源码解读</h1>
+        
+
+        <div class="post-meta">
+         
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-25T00:00:00+08:00">
+                2018-08-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读别人的源码，涨自己的智慧/" itemprop="url" rel="index">
+                    <span itemprop="name">读别人的源码，涨自己的智慧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+  
+
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,262字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HorizontalListView源码解读"><a href="#HorizontalListView源码解读" class="headerlink" title="HorizontalListView源码解读"></a>HorizontalListView源码解读</h1><p>[TOC]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>​    随着RecycleView进入人们的视野，其强大的功能让人们逐渐忘记了曾经的王者”AdapterView”,但这绝不影响它对我们的吸引力，要知道当年流行的Gallery，Spinner，ListView，GridView等等都是它的孩子。</p>
+<p>​    那么，假如今天我们要在它的孩子中增加一个横向滚动控件，我们应该怎么实现呢？HorizontalListView给出了我们想要的答案。</p>
+<h2 id="把ListView横过来"><a href="#把ListView横过来" class="headerlink" title="把ListView横过来"></a>把ListView横过来</h2><h3 id="需要什么类辅助"><a href="#需要什么类辅助" class="headerlink" title="需要什么类辅助"></a>需要什么类辅助</h3><ul>
+<li><p>Scroller</p>
+<p>一个平滑滚动的辅助工具,可以随时获取当前横向滚动距离,这里使用为了跟踪fling事件。</p>
+<ul>
+<li><blockquote>
+<p>调用关系</p>
+<p>onLayout -&gt; computerScrollOffset //获得新的滚动位置x,y。</p>
+<p>onFling -&gt; fling //根据手势和速度,计算滚动距离。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>GestureListener</p>
+<p>一个用来跟踪触摸，点击，长按事件的监听器。</p>
+<p>[onDown,onFling,onScrol,onSingleTapConfirm,onLongPress]</p>
+</li>
+<li><p>ListAdapter</p>
+<p>一个非常常见的可用于填充数据和视图的适配器。</p>
+</li>
+<li><p>EdgeEffectCompat</p>
+<p>一个处理两边边界动画效果的工具,在合适的时机传入距离,速度等参数进行渲染。</p>
+<p>[onAbsorb,onPull,onRelease]</p>
+<ul>
+<li><blockquote>
+<p>调用关系</p>
+<p>onScroll -&gt; updateOverscrollAnimation -&gt; onPull </p>
+<p>dispatchDraw -&gt; drawEdgeGlow -&gt;[setSize,draw]</p>
+<p>onLayout -&gt; onAbsorb</p>
+<p>onTouchEvent -&gt; releaseEdgeGlow -&gt; onRelease</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="布局处理"><a href="#布局处理" class="headerlink" title="布局处理"></a>布局处理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 1.判断是否需要重置数据</span></span><br><span class="line"><span class="comment"> * 2.恢复之前的滚动状态</span></span><br><span class="line"><span class="comment"> * 3.滚动状态的合法性校验</span></span><br><span class="line"><span class="comment"> * 4.获得deltx之后处理滚动后布局问题</span></span><br><span class="line"><span class="comment"> *   4.1 remove 滚动后的最左边子视图右边距小于0，最右边的子视图左边距大于父宽度</span></span><br><span class="line"><span class="comment"> *   4.2 add 向右边，向左边添加滚动后可见的新的子视图</span></span><br><span class="line"><span class="comment"> *   4.3 根据dx重新layout这些子视图</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> changed</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> left</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> top</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> right</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> bottom</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@SuppressLint</span>(<span class="string">"WrongCall"</span>)</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLayout</span><span class="params">(<span class="keyword">boolean</span> changed, <span class="keyword">int</span> left, <span class="keyword">int</span> top, <span class="keyword">int</span> right, <span class="keyword">int</span> bottom)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onLayout(changed, left, top, right, bottom);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mAdapter == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Force the OS to redraw this view</span></span><br><span class="line">    invalidate();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the data changed then reset everything and render from scratch at the same offset as last time</span></span><br><span class="line">    <span class="keyword">if</span> (mDataChanged) &#123;</span><br><span class="line">        <span class="keyword">int</span> oldCurrentX = mCurrentX;</span><br><span class="line">        initView();</span><br><span class="line">        removeAllViewsInLayout();</span><br><span class="line">        mNextX = oldCurrentX;</span><br><span class="line">        mDataChanged = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If restoring from a rotation</span></span><br><span class="line">    <span class="keyword">if</span> (mRestoreX != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mNextX = mRestoreX;</span><br><span class="line">        mRestoreX = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If in a fling</span></span><br><span class="line">    <span class="keyword">if</span> (mFlingTracker.computeScrollOffset()) &#123;</span><br><span class="line">        <span class="comment">// Compute the next position</span></span><br><span class="line">        mNextX = mFlingTracker.getCurrX();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Prevent scrolling past 0 so you can't scroll past the end of the list to the left</span></span><br><span class="line">    <span class="keyword">if</span> (mNextX &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        mNextX = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Show an edge effect absorbing the current velocity</span></span><br><span class="line">        <span class="keyword">if</span> (mEdgeGlowLeft.isFinished()) &#123;</span><br><span class="line">            mEdgeGlowLeft.onAbsorb((<span class="keyword">int</span>) determineFlingAbsorbVelocity());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mFlingTracker.forceFinished(<span class="keyword">true</span>);</span><br><span class="line">        setCurrentScrollState(OnScrollStateChangedListener.ScrollState.SCROLL_STATE_IDLE);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mNextX &gt; mMaxX) &#123;</span><br><span class="line">        <span class="comment">// Clip the maximum scroll position at mMaxX so you can't scroll past the end of the list to the right</span></span><br><span class="line">        mNextX = mMaxX;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Show an edge effect absorbing the current velocity</span></span><br><span class="line">        <span class="keyword">if</span> (mEdgeGlowRight.isFinished()) &#123;</span><br><span class="line">            mEdgeGlowRight.onAbsorb((<span class="keyword">int</span>) determineFlingAbsorbVelocity());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mFlingTracker.forceFinished(<span class="keyword">true</span>);</span><br><span class="line">        setCurrentScrollState(OnScrollStateChangedListener.ScrollState.SCROLL_STATE_IDLE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Calculate our delta from the last time the view was drawn</span></span><br><span class="line">    <span class="keyword">int</span> dx = mCurrentX - mNextX;</span><br><span class="line">    removeNonVisibleChildren(dx);</span><br><span class="line">    fillList(dx);</span><br><span class="line">    positionChildren(dx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Since the view has now been drawn, update our current position</span></span><br><span class="line">    mCurrentX = mNextX;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If we have scrolled enough to lay out all views, then determine the maximum scroll position now</span></span><br><span class="line">    <span class="keyword">if</span> (determineMaxX()) &#123;</span><br><span class="line">        <span class="comment">// Redo the layout pass since we now know the maximum scroll position</span></span><br><span class="line">        onLayout(changed, left, top, right, bottom);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the fling has finished</span></span><br><span class="line">    <span class="keyword">if</span> (mFlingTracker.isFinished()) &#123;</span><br><span class="line">        <span class="comment">// If the fling just ended</span></span><br><span class="line">        <span class="keyword">if</span> (mCurrentScrollState == OnScrollStateChangedListener.ScrollState.SCROLL_STATE_FLING) &#123;</span><br><span class="line">            setCurrentScrollState(OnScrollStateChangedListener.ScrollState.SCROLL_STATE_IDLE);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Still in a fling so schedule the next frame</span></span><br><span class="line">        ViewCompat.postOnAnimation(<span class="keyword">this</span>, mDelayedLayout);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="手势处理"><a href="#手势处理" class="headerlink" title="手势处理"></a>手势处理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">GestureListener</span> <span class="keyword">extends</span> <span class="title">GestureDetector</span>.<span class="title">SimpleOnGestureListener</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onDown</span><span class="params">(MotionEvent e)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> HorizontalListView.<span class="keyword">this</span>.onDown(e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 跟踪fling事件入口</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e1</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e2</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> velocityX</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> velocityY</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onFling</span><span class="params">(MotionEvent e1, MotionEvent e2, <span class="keyword">float</span> velocityX, <span class="keyword">float</span> velocityY)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> HorizontalListView.<span class="keyword">this</span>.onFling(e1, e2, velocityX, velocityY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 更新滚动状态计算获得新的nextX </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e1</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e2</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> distanceX</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> distanceY</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onScroll</span><span class="params">(MotionEvent e1, MotionEvent e2, <span class="keyword">float</span> distanceX, <span class="keyword">float</span> distanceY)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Lock the user into interacting just with this view</span></span><br><span class="line">        requestParentListViewToNotInterceptTouchEvents(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">        setCurrentScrollState(OnScrollStateChangedListener.ScrollState.SCROLL_STATE_TOUCH_SCROLL);</span><br><span class="line">        unpressTouchedChild();</span><br><span class="line">        mNextX += (<span class="keyword">int</span>) distanceX;</span><br><span class="line">        updateOverscrollAnimation(Math.round(distanceX));</span><br><span class="line">        requestLayout();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据 MotionEvent找到真正的childIndex，获得child后传递click事件</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onSingleTapConfirmed</span><span class="params">(MotionEvent e)</span> </span>&#123;</span><br><span class="line">        unpressTouchedChild();</span><br><span class="line">        OnItemClickListener onItemClickListener = getOnItemClickListener();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> index = getChildIndex((<span class="keyword">int</span>) e.getX(), (<span class="keyword">int</span>) e.getY());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If the tap is inside one of the child views, and we are not blocking touches</span></span><br><span class="line">        <span class="keyword">if</span> (index &gt;= <span class="number">0</span> &amp;&amp; !mBlockTouchAction) &#123;</span><br><span class="line">            View child = getChildAt(index);</span><br><span class="line">            <span class="keyword">int</span> adapterIndex = mLeftViewAdapterIndex + index;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (onItemClickListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                onItemClickListener.onItemClick(HorizontalListView.<span class="keyword">this</span>, child, adapterIndex, mAdapter.getItemId(adapterIndex));</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mOnClickListener != <span class="keyword">null</span> &amp;&amp; !mBlockTouchAction) &#123;</span><br><span class="line">            mOnClickListener.onClick(HorizontalListView.<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据 MotionEvent找到真正的childIndex，获得child后传递LongClick事件</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLongPress</span><span class="params">(MotionEvent e)</span> </span>&#123;</span><br><span class="line">        unpressTouchedChild();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> index = getChildIndex((<span class="keyword">int</span>) e.getX(), (<span class="keyword">int</span>) e.getY());</span><br><span class="line">        <span class="keyword">if</span> (index &gt;= <span class="number">0</span> &amp;&amp; !mBlockTouchAction) &#123;</span><br><span class="line">            View child = getChildAt(index);</span><br><span class="line">            OnItemLongClickListener onItemLongClickListener = getOnItemLongClickListener();</span><br><span class="line">            <span class="keyword">if</span> (onItemLongClickListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> adapterIndex = mLeftViewAdapterIndex + index;</span><br><span class="line">                <span class="keyword">boolean</span> handled = onItemLongClickListener.onItemLongClick(HorizontalListView.<span class="keyword">this</span>, child, adapterIndex, mAdapter</span><br><span class="line">                        .getItemId(adapterIndex));</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (handled) &#123;</span><br><span class="line">                    <span class="comment">// BZZZTT!!1!</span></span><br><span class="line">                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="复用机制"><a href="#复用机制" class="headerlink" title="复用机制"></a>复用机制</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//每一个Adapter的type对应一个queue，把同一个type的view插入到同一个queue中,然后通过queue的offer/poll接口进行复用</span></span><br><span class="line"><span class="keyword">private</span> List&lt;Queue&lt;View&gt;&gt; mRemovedViewsCache = <span class="keyword">new</span> ArrayList&lt;Queue&lt;View&gt;&gt;();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><blockquote>
+<p>调用关系</p>
+<p>setAdapter -&gt; initializeRecycledViewCache(typeCount) -&gt; [clear,add]<br>[fillListLeft,fillRight] -&gt; getRecycledView -&gt; [poll]<br>removeNonVisibleChildren -&gt; recycleView -&gt; [offer]</p>
+</blockquote>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2018/08/25/HorizontalListView源码解读/" title="HorizontalListView源码解读">http://jinjian.info/2018/08/25/HorizontalListView源码解读/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RTFSC-Read-the-fucking-source-code/" rel="tag"># RTFSC (Read the fucking source code )</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/29/Flutter 混合开发/" rel="next" title="如何进行Flutter混合开发">
+                <i class="fa fa-chevron-left"></i> 如何进行Flutter混合开发
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HorizontalListView源码解读"><span class="nav-number">1.</span> <span class="nav-text">HorizontalListView源码解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#把ListView横过来"><span class="nav-number">1.2.</span> <span class="nav-text">把ListView横过来</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#需要什么类辅助"><span class="nav-number">1.2.1.</span> <span class="nav-text">需要什么类辅助</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#布局处理"><span class="nav-number">1.2.2.</span> <span class="nav-text">布局处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手势处理"><span class="nav-number">1.2.3.</span> <span class="nav-text">手势处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">1.2.4.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#复用机制"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">复用机制</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
