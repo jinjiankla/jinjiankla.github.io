@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Flutter," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="聊聊Flutter Platform SDK[TOC] 前言​    从Flutter的架构图中可以看出，Flutter Platform SDK处于整个Flutter框架的上层，连接了Java与Dart代码。那么作为“最上层”的它，到底扮演了哪些角色，以及是如何扮演好这些角色的呢？Google工程师用一个封装好的flutter.jar包”show me the answer”。 Platform">
+<meta name="keywords" content="Flutter">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊聊Flutter Platform SDK">
+<meta property="og:url" content="http://jinjian.info/2018/10/20/聊聊Flutter Platform SDK/index.html">
+<meta property="og:site_name" content="Desire">
+<meta property="og:description" content="聊聊Flutter Platform SDK[TOC] 前言​    从Flutter的架构图中可以看出，Flutter Platform SDK处于整个Flutter框架的上层，连接了Java与Dart代码。那么作为“最上层”的它，到底扮演了哪些角色，以及是如何扮演好这些角色的呢？Google工程师用一个封装好的flutter.jar包”show me the answer”。 Platform">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/flutter_seq.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/flutter内聚.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/1655b109f83bea9b.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/channel.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/解码.jpg?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/channel流程图.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/pluginregister.png?raw=true">
+<meta property="og:updated_time" content="2018-10-21T11:20:28.441Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="聊聊Flutter Platform SDK">
+<meta name="twitter:description" content="聊聊Flutter Platform SDK[TOC] 前言​    从Flutter的架构图中可以看出，Flutter Platform SDK处于整个Flutter框架的上层，连接了Java与Dart代码。那么作为“最上层”的它，到底扮演了哪些角色，以及是如何扮演好这些角色的呢？Google工程师用一个封装好的flutter.jar包”show me the answer”。 Platform">
+<meta name="twitter:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/flutter_seq.png?raw=true">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2018/10/20/聊聊Flutter Platform SDK/"/>
+
+
+
+
+
+  <title>聊聊Flutter Platform SDK | Desire</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2018/10/20/聊聊Flutter Platform SDK/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">聊聊Flutter Platform SDK</h1>
+        
+
+        <div class="post-meta">
+         
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-20T00:00:00+08:00">
+                2018-10-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/被Flutter玩转的日子/" itemprop="url" rel="index">
+                    <span itemprop="name">被Flutter玩转的日子</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+  
+
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,703字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="聊聊Flutter-Platform-SDK"><a href="#聊聊Flutter-Platform-SDK" class="headerlink" title="聊聊Flutter Platform SDK"></a>聊聊Flutter Platform SDK</h1><p>[TOC]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>​    从Flutter的架构图中可以看出，Flutter Platform SDK处于整个Flutter框架的上层，连接了Java与Dart代码。那么作为“最上层”的它，到底扮演了哪些角色，以及是如何扮演好这些角色的呢？Google工程师用一个封装好的flutter.jar包”show me the answer”。</p>
+<h2 id="Platform-SDK-的角色扮演"><a href="#Platform-SDK-的角色扮演" class="headerlink" title="Platform SDK 的角色扮演"></a>Platform SDK 的角色扮演</h2><p>​    通过对Platform SDK(以下简称 Platform)源码的阅读，可以大致将它分成三个角色：Creator（创建者），Transmitter（传递者），Registrant（注册人）。</p>
+<h3 id="Creator"><a href="#Creator" class="headerlink" title="Creator"></a>Creator</h3><p>创建者</p>
+<h4 id="FlutterMain"><a href="#FlutterMain" class="headerlink" title="FlutterMain"></a>FlutterMain</h4><h5 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h5><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/flutter_seq.png?raw=true" alt="flutter_seq"></p>
+<p>FlutterMain担任着flutter的初始化工作，在被Application的onCreate调起后</p>
+<ul>
+<li><p>initConfig</p>
+<p>必须的配置文件名称和路径</p>
+<ul>
+<li><p>通过命令行 flutter build aot生成的文件</p>
+<p>| 名称                   | 内容            |<br>| ———————- | ————— |<br>| isolate_snapshot_instr | 应用程序指令段  |<br>| isolate_snapshot_data  | 应用程序数据段  |<br>| vm_snapshot_instr      | VM 虚拟机指令段 |<br>| vm_snapshot_data       | VM 虚拟机数据段 |</p>
+</li>
+</ul>
+<p>​       注:详细含义参见<a href="https://github.com/flutter/engine/wiki/Flutter-Engine-Operation-in-AOT-Mode" target="_blank" rel="noopener">官方说明</a></p>
+<ul>
+<li><p>路径信息</p>
+<p>flutter_assets等文件的路径信息</p>
+</li>
+</ul>
+</li>
+<li><p>initAot</p>
+<ol>
+<li>初始化标记位:snapshot文件集成的方式。</li>
+<li>sIsPrecompiledAsSharedLibrary 代表的是把所有的snapshot文件打包成一个动态库(一种类似ios的集成方式)。</li>
+<li>禁止同时采用两种集成方式。</li>
+</ol>
+</li>
+<li><p>initResource</p>
+<ol>
+<li>创建了一个ResourceExtractor 对象,他是Resource文件的搬运工</li>
+<li>通过ResourceExtractor 对象的addResource方法初始化需要搬运的文件</li>
+<li>ResourceExtractor启动异步任务把asset下面的文件搬运到DataDir的flutter目录下面</li>
+</ol>
+</li>
+</ul>
+<h4 id="FlutterActivityDelegate"><a href="#FlutterActivityDelegate" class="headerlink" title="FlutterActivityDelegate"></a>FlutterActivityDelegate</h4><h5 id="WhatDelegate"><a href="#WhatDelegate" class="headerlink" title="WhatDelegate"></a>WhatDelegate</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//FlutterActivity.java</span></span><br><span class="line">......</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> FlutterActivityEvents eventDelegate;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Provider viewProvider;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> PluginRegistry pluginRegistry;   </span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> FlutterActivityDelegate delegate = <span class="keyword">new</span> FlutterActivityDelegate(<span class="keyword">this</span>, <span class="keyword">this</span>);</span><br><span class="line">......</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">FlutterActivity</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.eventDelegate = <span class="keyword">this</span>.delegate;</span><br><span class="line">        <span class="keyword">this</span>.viewProvider = <span class="keyword">this</span>.delegate;</span><br><span class="line">        <span class="keyword">this</span>.pluginRegistry = <span class="keyword">this</span>.delegate;</span><br><span class="line">    &#125;</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<p> 我们可以从上面FlutterActivity的构造函数中看出Delegate到底代理了哪些职责</p>
+<ul>
+<li><p>FlutterActivityEvents：将Activity生命周期的具体处理逻辑传递给FlutterView</p>
+</li>
+<li><p>Provider：在onCreate中创建的FlutterView，通过实现Provider的接口暴露出来</p>
+</li>
+<li><p>PluginRegistry:插件信息的注册与查询传递给FlutterView</p>
+<p>从上面看来，其实FlutterActivityDelegate直接交互的对象就是FlutterView，通过这样的设计，提高了每一个类的内聚性</p>
+</li>
+</ul>
+<p>​    <img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/flutter内聚.png?raw=true" alt="flutter内聚"></p>
+<h4 id="FlutterView"><a href="#FlutterView" class="headerlink" title="FlutterView"></a>FlutterView</h4><p>可以先简单的把FlutterView看成是负责显示的，而把后面的FlutterNativeView看成是负责通信的。</p>
+<ul>
+<li><p>解偶系统控件</p>
+<p>首先我们可以看到FlutterView是继承自SurfaceView的，提到SurfaceView我们肯定会想到“挖洞”，“双缓冲”这些词，也正是因为这些特性FlutterView可以很好的把UI渲染工作交给Flutter（ 后者通过dart-&gt;组装LayerTree-&gt;Skia完成绘制 )。</p>
+</li>
+</ul>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/1655b109f83bea9b.png?raw=true" alt="1655b109f83bea9b"></p>
+<ul>
+<li><p>传递状态消息给Dart UI</p>
+<p>这些消息大致可以将它们分成七个模块，两大类</p>
+<ol>
+<li><p>通过反射原生系统的api进行数据通讯</p>
+<p>多语言模块、系统信息和用户设置</p>
+</li>
+<li><p>将数据打包成特殊格式以消息的形式和使用Dart编写的flutter控件交互</p>
+<p>生命周期、按键消息、路由导航和平台插件</p>
+</li>
+</ol>
+</li>
+</ul>
+<h4 id="FlutterNativeView"><a href="#FlutterNativeView" class="headerlink" title="FlutterNativeView"></a>FlutterNativeView</h4><p>可以先简单的把FlutterNativeView看成是负责通信的。它在系统层面上实现了BinaryMessenger接口 [这在下文<strong>Transmitter</strong>中详细介绍]。</p>
+<h3 id="Transmitter"><a href="#Transmitter" class="headerlink" title="Transmitter"></a>Transmitter</h3><p>传递者</p>
+<h4 id="消息渠道"><a href="#消息渠道" class="headerlink" title="消息渠道"></a>消息渠道</h4><ul>
+<li><p>Flutter针对不同的应用场景封装了3类Channel</p>
+<ol>
+<li>MethodChannel：调用方法</li>
+<li>BasicMessageChannel：自定义结构信息</li>
+<li>EventChannel：事件的通知         </li>
+</ol>
+</li>
+<li><p>3类Channel拥有相似的结构类型</p>
+<ol>
+<li>信使BinaryMessenger：我们自己创建的channel一般就是FlutterNativeView</li>
+<li>channel 名：channel的key值，不可重复</li>
+<li>MethodCodec /MessageCodec 解码器: 针对不同的channle解码二进制应答数据</li>
+</ol>
+</li>
+</ul>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/channel.png?raw=true" alt="channel"></p>
+<h4 id="消息编解码"><a href="#消息编解码" class="headerlink" title="消息编解码"></a>消息编解码</h4><p>​    标准平台通道使用一个标准的消息编解码器。简单的JSON类值（如布尔值）的高效二进制序列化，数字、字符串、字节缓冲区以及这些列表和映射。(查看细节 <a href="https://docs.flutter.io/flutter/services/StandardMessageCodec-class.html" target="_blank" rel="noopener"><code>StandardMessageCodec</code></a>)。这些值的序列化和反序列化在消息发送和接收值时自动发生。（对应的数据转化关系如下）</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/解码.jpg?raw=true" alt="解码"></p>
+<h4 id="传递流程"><a href="#传递流程" class="headerlink" title="传递流程"></a>传递流程</h4><p>​    通过Flutter Engine的数据转换,使得Dart和Android之间可以进行通信</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/channel流程图.png?raw=true" alt="channel流程图"></p>
+<h3 id="Registrant"><a href="#Registrant" class="headerlink" title="Registrant"></a>Registrant</h3><p>注册人</p>
+<h4 id="情境转换"><a href="#情境转换" class="headerlink" title="情境转换"></a>情境转换</h4><p>​    首先这里有三个形似得英文单词registry, registrar and registrant分别对应注册局，注册商和注册人。把它们翻译到现实的生活场景中的角色其实是一个“注册人通过注册商，更新注册信息后，注册商把信息传递给注册局进行保存”的过程。下面我们把这个过程再翻译回代码：</p>
+<p>首先我们新建一个plugin插件,作为说明的对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 实现 PluginRegistry.ActivityResultListener</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FlutterMusicPlugin</span> <span class="keyword">implements</span> <span class="title">MethodCallHandler</span>, <span class="title">PluginRegistry</span>.<span class="title">ActivityResultListener</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">registerWith</span><span class="params">(Registrar registrar)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//传入Activity</span></span><br><span class="line">        <span class="keyword">final</span> FlutterMusicPlugin plugin = <span class="keyword">new</span> FlutterMusicPlugin(registrar.activity());</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// 注册ActivityResult回调</span></span><br><span class="line">        registrar.addActivityResultListener(plugin);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onMethodCall</span><span class="params">(MethodCall call, Result result)</span> </span>&#123;</span><br><span class="line">           ...</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span> </span>&#123;</span><br><span class="line">           ...</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同时在GeneratedPluginRegistrant类中会自动生成</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">GeneratedPluginRegistrant</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">registerWith</span><span class="params">(PluginRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (alreadyRegisteredWith(registry)) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> FlutterMusicPlugin.registerWith(registry.registrarFor(<span class="string">"com.plugin.FlutterMusicPlugin"</span>));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">alreadyRegisteredWith</span><span class="params">(PluginRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> String key = GeneratedPluginRegistrant.class.getCanonicalName();</span><br><span class="line">    <span class="keyword">if</span> (registry.hasPlugin(key)) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    registry.registrarFor(key);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="注册人"><a href="#注册人" class="headerlink" title="注册人"></a>注册人</h4><p>​    它对应的是代码中的GeneratedPluginRegistrant类</p>
+<ul>
+<li><p>发起注册</p>
+<p>GeneratedPluginRegistrant类中的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FlutterMusicPlugin.registerWith(registry.registrarFor(<span class="string">"com.plugin.FlutterMusicPlugin"</span>));<span class="comment">//即为发起注册点</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过注册商更新注册</p>
+<p>FlutterMusicPlugin类中的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">registrar.addActivityResultListener(plugin);<span class="comment">//即为通过注册商更新了需要Activity回调的信息</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>同步给注册局</p>
+<p>sdk中的FlutterRegistrar类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FlutterPluginRegistry.<span class="keyword">this</span>.mActivityResultListeners.add(listener);<span class="comment">//即为把信息同步给了注册局</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="注册商"><a href="#注册商" class="headerlink" title="注册商"></a>注册商</h4><p>​    它对应的是代码中的FlutterPluginRegistry内部类FlutterRegistrar。</p>
+<p>​    不看不知道，”注册商”其实给我们提供了很多功能，比如获取activity，viewDestory的生命周期的回调，获取surfaceTexture等等，真是一个能力强大的”注册商”。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">      </span><br><span class="line"><span class="function">Activity <span class="title">activity</span><span class="params">()</span></span>;<span class="comment">//返回 Host app的Activity</span></span><br><span class="line"><span class="function">Context <span class="title">context</span><span class="params">()</span></span>;<span class="comment">//返回 Application Context.</span></span><br><span class="line"><span class="function">Context <span class="title">activeContext</span><span class="params">()</span></span>;<span class="comment">//返回 活动Context</span></span><br><span class="line"><span class="comment">//返回 BinaryMessenger 主要用来注册Platform channels</span></span><br><span class="line"><span class="function">BinaryMessenger <span class="title">messenger</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//返回 TextureRegistry，从里面可以拿到SurfaceTexture </span></span><br><span class="line"><span class="function">TextureRegistry <span class="title">textures</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//返回 当前Host app创建的FlutterView</span></span><br><span class="line"><span class="function">FlutterView <span class="title">view</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//返回Asset对应的文件路径</span></span><br><span class="line"><span class="function">String <span class="title">lookupKeyForAsset</span><span class="params">(String var1)</span></span>;</span><br><span class="line"><span class="comment">//返回Asset对应的文件路径</span></span><br><span class="line"><span class="function">String <span class="title">lookupKeyForAsset</span><span class="params">(String var1, String var2)</span></span>;</span><br><span class="line"><span class="comment">//插件对外发布的一个"值"</span></span><br><span class="line">PluginRegistry.<span class="function">Registrar <span class="title">publish</span><span class="params">(Object var1)</span></span>;</span><br><span class="line"><span class="comment">//注册权限相关的回调</span></span><br><span class="line">PluginRegistry.<span class="function">Registrar <span class="title">addRequestPermissionsResultListener</span><span class="params">(PluginRegistry.RequestPermissionsResultListener var1)</span></span>;</span><br><span class="line"><span class="comment">//注册ActivityResult回调</span></span><br><span class="line">PluginRegistry.<span class="function">Registrar <span class="title">addActivityResultListener</span><span class="params">(PluginRegistry.ActivityResultListener var1)</span></span>;</span><br><span class="line"><span class="comment">//注册NewIntent回调</span></span><br><span class="line">PluginRegistry.<span class="function">Registrar <span class="title">addNewIntentListener</span><span class="params">(PluginRegistry.NewIntentListener var1)</span></span>;</span><br><span class="line"><span class="comment">//注册UserLeaveHint回调</span></span><br><span class="line">PluginRegistry.<span class="function">Registrar <span class="title">addUserLeaveHintListener</span><span class="params">(PluginRegistry.UserLeaveHintListener var1)</span></span>;</span><br><span class="line"><span class="comment">//注册View销毁回调</span></span><br><span class="line">PluginRegistry.<span class="function">Registrar <span class="title">addViewDestroyListener</span><span class="params">(PluginRegistry.ViewDestroyListener var1)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="注册局"><a href="#注册局" class="headerlink" title="注册局"></a>注册局</h4><p>​    它对应的是代码中的FlutterPluginRegistry</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/platform_sdk_img/pluginregister.png?raw=true" alt="pluginregister"></p>
+<p> 从成员变量可以看出FlutterPluginRegistry主要维护两类信息:</p>
+<ol>
+<li>注册插件唯一标识信息汇总</li>
+<li>FlutterRegistrar所开放的那些功能(比如：addActivityResultListener)的信息汇总</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2018/10/20/聊聊Flutter Platform SDK/" title="聊聊Flutter Platform SDK">http://jinjian.info/2018/10/20/聊聊Flutter Platform SDK/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Flutter/" rel="tag"># Flutter</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/01/我的《心智防身术》/" rel="next" title="我的《心智防身术》">
+                <i class="fa fa-chevron-left"></i> 我的《心智防身术》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#聊聊Flutter-Platform-SDK"><span class="nav-number">1.</span> <span class="nav-text">聊聊Flutter Platform SDK</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Platform-SDK-的角色扮演"><span class="nav-number">1.2.</span> <span class="nav-text">Platform SDK 的角色扮演</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Creator"><span class="nav-number">1.2.1.</span> <span class="nav-text">Creator</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FlutterMain"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">FlutterMain</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#时序图"><span class="nav-number">1.2.1.1.1.</span> <span class="nav-text">时序图</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FlutterActivityDelegate"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">FlutterActivityDelegate</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#WhatDelegate"><span class="nav-number">1.2.1.2.1.</span> <span class="nav-text">WhatDelegate</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FlutterView"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">FlutterView</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FlutterNativeView"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">FlutterNativeView</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transmitter"><span class="nav-number">1.2.2.</span> <span class="nav-text">Transmitter</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#消息渠道"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">消息渠道</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消息编解码"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">消息编解码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#传递流程"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">传递流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Registrant"><span class="nav-number">1.2.3.</span> <span class="nav-text">Registrant</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#情境转换"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">情境转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注册人"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">注册人</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注册商"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">注册商</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注册局"><span class="nav-number">1.2.3.4.</span> <span class="nav-text">注册局</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
