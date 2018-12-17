@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="layout: posttitle: Flutter Live 2018之神器初体验(番外篇)key: 20181217tags: Fluttercategories: Android遇见Flutter Flutter Live 2018之神器初体验(番外篇)[TOC] 前言正如官方总结的Flutter的四大特点  Material Design 与 Cupertino 的精美界面 媲美原生的加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Desire">
+<meta property="og:url" content="http://jinjian.info/2018/12/17/Flutter Live 2018之神器初体验/index.html">
+<meta property="og:site_name" content="Desire">
+<meta property="og:description" content="layout: posttitle: Flutter Live 2018之神器初体验(番外篇)key: 20181217tags: Fluttercategories: Android遇见Flutter Flutter Live 2018之神器初体验(番外篇)[TOC] 前言正如官方总结的Flutter的四大特点  Material Design 与 Cupertino 的精美界面 媲美原生的加">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/sjzy.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/flare_panel.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/build.gif?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/build%20and%20copy.gif?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/scbgl.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/code_magic_panel.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/code_magic_panel_2.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/yzyjp.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/desktop.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/lhsz.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/web_animation.gif?raw=true">
+<meta property="og:updated_time" content="2018-12-17T08:40:37.016Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Desire">
+<meta name="twitter:description" content="layout: posttitle: Flutter Live 2018之神器初体验(番外篇)key: 20181217tags: Fluttercategories: Android遇见Flutter Flutter Live 2018之神器初体验(番外篇)[TOC] 前言正如官方总结的Flutter的四大特点  Material Design 与 Cupertino 的精美界面 媲美原生的加">
+<meta name="twitter:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/sjzy.png?raw=true">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2018/12/17/Flutter Live 2018之神器初体验/"/>
+
+
+
+
+
+  <title> | Desire</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2018/12/17/Flutter Live 2018之神器初体验/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+         
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-17T00:00:00+08:00">
+                2018-12-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+  
+
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,223字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <hr>
+<p>layout: post<br>title: Flutter Live 2018之神器初体验(番外篇)<br>key: 20181217<br>tags: Flutter<br>categories: Android遇见Flutter</p>
+<h1 id="Flutter-Live-2018之神器初体验-番外篇"><a href="#Flutter-Live-2018之神器初体验-番外篇" class="headerlink" title="Flutter Live 2018之神器初体验(番外篇)"></a>Flutter Live 2018之神器初体验(番外篇)</h1><p>[TOC]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>正如官方总结的Flutter的四大特点</p>
+<ul>
+<li>Material Design 与 Cupertino 的精美界面</li>
+<li>媲美原生的加载速度</li>
+<li>HotReload让开发无比高效</li>
+<li>Plugin的开放与共享</li>
+</ul>
+<h2 id="四大神器"><a href="#四大神器" class="headerlink" title="四大神器"></a>四大神器</h2><p>“纸上得来终觉浅，绝知此事要躬行”，接下来将小编将尝试体验一下Flutter Live 2018中出现的神器们，他们中的每一个都有“让人惊掉下巴”的能力，不由让我想起了小时候看《新白娘子传奇》时，小青偷盗梁王府的”四件宝贝”。</p>
+<h3 id="神钧天奏乐图-Flare"><a href="#神钧天奏乐图-Flare" class="headerlink" title="神钧天奏乐图-Flare"></a>神钧天奏乐图-Flare</h3><p>前者打开后就听到的优美的乐曲，后者可以写出“酷炫狂拽吊炸天”的动画</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/sjzy.png?raw=true" alt="sjzy"></p>
+<h4 id="如何编曲"><a href="#如何编曲" class="headerlink" title="如何编曲"></a>如何编曲</h4><ol>
+<li><p>打开www.2dimensions.com 任意fork一幅作品(本文以<a href="https://www.2dimensions.com/a/JuanCarlos/files/flare/new-file-8" target="_blank" rel="noopener">https://www.2dimensions.com/a/JuanCarlos/files/flare/new-file-8</a> 为例)</p>
+</li>
+<li><p>界面功能说明</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/flare_panel.png?raw=true" alt="flare_panel"></p>
+<ul>
+<li><p>STEUP &amp;&amp; ANIMATE （1）</p>
+<p>其中STEUP是动画界面的静态素材界面。制作完成后，我们就可以切换到ANIMATE 的TAB,让它动起来。</p>
+</li>
+<li><p>ANIMATIONS（2）</p>
+<p>这个是flare的特色之一，一个.flr文件可以对应多个动画。就像我们例子中的那个，他包含了”Build and Fade Out”和”Build”两个个动画，这样我们可以通过代码任意播放其中的一个。</p>
+</li>
+<li><p>TIMELINE（3）</p>
+<p>这个是flare的另一个特色，它可以直观的快速预览所做的动画。左边的”Logo”,”Flare”之类的其实对应的是SETUP中的某一个素材，右边的菱形其实对应的是这个素材在这个时间点对应的属性变化。</p>
+</li>
+<li><p>ANIMATE PROPERTY（4）</p>
+<p>一个素材在特定时间点发生了哪些属性变化，这些变化点的调节就是在这里了。</p>
+</li>
+<li><p>INTERPOLATION（5）</p>
+<p>属性发生变化的快慢,是”Linear”还是”Cubic”或是其他,就是在这里设置的。</p>
+</li>
+</ul>
+</li>
+<li><p>视频教学</p>
+<p>可以按照这个<a href="https://www.youtube.com/watch?v=eeXdA6gow3s" target="_blank" rel="noopener">教程</a>来Step by Step。</p>
+</li>
+</ol>
+<h4 id="如何奏乐"><a href="#如何奏乐" class="headerlink" title="如何奏乐"></a>如何奏乐</h4><ol>
+<li><p>修改 pubspec.yaml，添加fluttercode依赖。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dependencies:</span><br><span class="line">  flutter:</span><br><span class="line">    sdk: flutter</span><br><span class="line">  flarecode:</span><br><span class="line">    path: flarecode</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>从2dimension.com上fork或者制作一个动画，然后将它导出放在assets/imgae文件夹下面，同时在pubspec.yaml中添加。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">assets:</span><br><span class="line">- images/</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在main.dart中引入flare的package并运行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'package:flarecode/flare_actor.dart'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>=&gt; runApp(</span><br><span class="line">      MaterialApp(</span><br><span class="line">        home: Scaffold(</span><br><span class="line">          body: FlareActor(</span><br><span class="line">            <span class="string">"images/flareintro.flr"</span>,</span><br><span class="line">            animation: <span class="string">"Build and Fade Out"</span>,</span><br><span class="line">          ),</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当然flare不同与其他动画效果的一点就是一个文件可以有Amintion1,2,3等等多个，所以我们可以把代码改成这样。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'package:flarecode/flare_actor.dart'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>=&gt; runApp(</span><br><span class="line">      MaterialApp(</span><br><span class="line">        home: Scaffold(</span><br><span class="line">          body: SafeArea(child: Demo()),</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Demo</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="function">_DemoState <span class="title">createState</span><span class="params">()</span> </span>=&gt; _DemoState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_DemoState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">Demo</span>&gt; </span>&#123;</span><br><span class="line">  String _animation = <span class="string">"Build"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="function">Widget <span class="title">build</span><span class="params">(BuildContext context)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Column(</span><br><span class="line">      children: &lt;Widget&gt;[</span><br><span class="line">        Expanded(</span><br><span class="line">          child: FlareActor(</span><br><span class="line">            <span class="string">"images/flareintro.flr"</span>,</span><br><span class="line">            animation: _animation,</span><br><span class="line">          ),</span><br><span class="line">        ),</span><br><span class="line">        RaisedButton(</span><br><span class="line">          child: Text(<span class="string">"Build"</span>),</span><br><span class="line">          onPressed: () &#123;</span><br><span class="line">            setState(() &#123;</span><br><span class="line">              _animation = <span class="string">"Build"</span>;</span><br><span class="line">            &#125;);</span><br><span class="line">          &#125;,</span><br><span class="line">        ),</span><br><span class="line">        RaisedButton(</span><br><span class="line">          child: Text(<span class="string">"Build and Fade Out"</span>),</span><br><span class="line">          onPressed: () &#123;</span><br><span class="line">            setState(() &#123;</span><br><span class="line">              _animation = <span class="string">"Build and Fade Out"</span>;</span><br><span class="line">            &#125;);</span><br><span class="line">          &#125;,</span><br><span class="line">        ),</span><br><span class="line">      ],</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="Showtime"><a href="#Showtime" class="headerlink" title="Showtime"></a>Showtime</h4><p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/build.gif?raw=true" alt="build"></p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/build%20and%20copy.gif?raw=true" alt="build and copy"></p>
+<h3 id="时辰八卦炉-Codemagic"><a href="#时辰八卦炉-Codemagic" class="headerlink" title="时辰八卦炉-Codemagic"></a>时辰八卦炉-Codemagic</h3><p>八卦炉是炼丹的，而CodeMageic是炼Flutter代码的</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/scbgl.png?raw=true" alt="scbgl"></p>
+<h4 id="“八卦炉”的初衷"><a href="#“八卦炉”的初衷" class="headerlink" title="“八卦炉”的初衷"></a>“八卦炉”的初衷</h4><p>引用Codemagic的制作方Never Code公司的原话 :</p>
+<p>“Our idea was that without any deep technical knowledge, app creators should be able to easily configure the whole flow from Flutter platform to their end users at Google Play or App Store.”</p>
+<p>其实就是让flutter的工程管理变得简单快捷。</p>
+<h4 id="“炉”内结构图"><a href="#“炉”内结构图" class="headerlink" title="“炉”内结构图"></a>“炉”内结构图</h4><p>直接扫描你的gitlab仓库，就会出现下面的界面</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/code_magic_panel.png?raw=true" alt="code_magic_panel"></p>
+<p>十分的清晰，点击红点1之后，就可以走到打包&amp;测试的流程里面了</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/code_magic_panel_2.png?raw=true" alt="code_magic_panel_2"></p>
+<p>最后的”Publishing artifacts”可以将最终的产物发送至你的邮箱，基本可以实现“一条龙的全自动服务”。</p>
+<h3 id="羊脂玉净瓶-Flutter-Desktop-Embedding"><a href="#羊脂玉净瓶-Flutter-Desktop-Embedding" class="headerlink" title="羊脂玉净瓶-Flutter Desktop Embedding"></a>羊脂玉净瓶-Flutter Desktop Embedding</h3><p>前者能使枯萎的植物复活，后者给逐渐稀缺的桌面开发者”续命一秒”</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/yzyjp.png?raw=true" alt="yzyjp"></p>
+<h4 id="秒变桌面开发者"><a href="#秒变桌面开发者" class="headerlink" title="秒变桌面开发者"></a>秒变桌面开发者</h4><p>1.搭建环境</p>
+<p>Clone <a href="https://github.com/google/flutter-desktop-embedding" target="_blank" rel="noopener">flutter-desktop-embedding</a>并且把它放在如下目录</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;parent dir&gt;</span><br><span class="line">  ├─ flutter (from http:<span class="comment">//github.com/flutter/flutter)</span></span><br><span class="line">  └─ flutter-desktop-embedding (from https:<span class="comment">//github.com/google/flutter-desktop-embedding)</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>根据自己的开发环境阅读相应的<a href="https://github.com/google/flutter-desktop-embedding/blob/master/library/README.md" target="_blank" rel="noopener">说明</a></p>
+</li>
+<li><p>Showtime之运行example下面的code</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/desktop.png?raw=true" alt="desktop"></p>
+</li>
+</ol>
+<h3 id="烈火神珠-Hummingbird"><a href="#烈火神珠-Hummingbird" class="headerlink" title="烈火神珠-Hummingbird"></a>烈火神珠-Hummingbird</h3><p>前者无水自沸，后者竟然是基于Web实现的运行时环境。不是”无水自沸”又是什么！！！</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/lhsz.png?raw=true" alt="lhsz"></p>
+<h4 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h4><p>看过《速度与激情》吗？每一部的结尾总会为下一部的剧情埋下伏笔（这都是套路！！！），所以才有了连续八部的高票房。这里的hummingbird就是为下一部(Google I/O 2019)埋下了伏笔。”No source code and No demo”，有的只是原理简介，有兴趣的可以<a href="https://medium.com/flutter-io/hummingbird-building-flutter-for-the-web-e687c2a023a8" target="_blank" rel="noopener">看看它</a>是如何实现在web上运行的。</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter/web_animation.gif?raw=true" alt="web_animation"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2018/12/17/Flutter Live 2018之神器初体验/" title="">http://jinjian.info/2018/12/17/Flutter Live 2018之神器初体验/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/Flutter视图绘制(2)/" rel="next" title="Flutter 视图绘制(2)">
+                <i class="fa fa-chevron-left"></i> Flutter 视图绘制(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Flutter-Live-2018之神器初体验-番外篇"><span class="nav-number">1.</span> <span class="nav-text">Flutter Live 2018之神器初体验(番外篇)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四大神器"><span class="nav-number">1.2.</span> <span class="nav-text">四大神器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#神钧天奏乐图-Flare"><span class="nav-number">1.2.1.</span> <span class="nav-text">神钧天奏乐图-Flare</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何编曲"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">如何编曲</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何奏乐"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">如何奏乐</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Showtime"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">Showtime</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#时辰八卦炉-Codemagic"><span class="nav-number">1.2.2.</span> <span class="nav-text">时辰八卦炉-Codemagic</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#“八卦炉”的初衷"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">“八卦炉”的初衷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#“炉”内结构图"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">“炉”内结构图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#羊脂玉净瓶-Flutter-Desktop-Embedding"><span class="nav-number">1.2.3.</span> <span class="nav-text">羊脂玉净瓶-Flutter Desktop Embedding</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#秒变桌面开发者"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">秒变桌面开发者</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#烈火神珠-Hummingbird"><span class="nav-number">1.2.4.</span> <span class="nav-text">烈火神珠-Hummingbird</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#未完待续"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">未完待续</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
