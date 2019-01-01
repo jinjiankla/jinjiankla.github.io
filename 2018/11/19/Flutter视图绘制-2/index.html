@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Flutter," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Desire" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="Flutter视图绘制(2)[TOC] 前言​    Flutter视图绘制(1)写的是自带Skia的flutter如何“安排”绘制的步骤，接下来的(2),(3),(4),(5)，我想首先通过回顾和总结Android的视图绘制，再来反观flutter的实现，最后对比他们的异同。所以虽然这篇文章的题目是“Flutter视图绘制(2)”但是是”挂羊头卖狗肉”的，本文讲的是Android。 五个问题谁来">
+<meta name="keywords" content="Flutter">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flutter 视图绘制(2)">
+<meta property="og:url" content="http://jinjian.info/2018/11/19/Flutter视图绘制-2/index.html">
+<meta property="og:site_name" content="Desire">
+<meta property="og:description" content="Flutter视图绘制(2)[TOC] 前言​    Flutter视图绘制(1)写的是自带Skia的flutter如何“安排”绘制的步骤，接下来的(2),(3),(4),(5)，我想首先通过回顾和总结Android的视图绘制，再来反观flutter的实现，最后对比他们的异同。所以虽然这篇文章的题目是“Flutter视图绘制(2)”但是是”挂羊头卖狗肉”的，本文讲的是Android。 五个问题谁来">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_normal.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/two_buffer.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_one_cache.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/tearing.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_no_sync.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_bad.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/create.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/dump.png?raw=true">
+<meta property="og:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/model.png?raw=true">
+<meta property="og:updated_time" content="2018-11-19T09:29:26.746Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flutter 视图绘制(2)">
+<meta name="twitter:description" content="Flutter视图绘制(2)[TOC] 前言​    Flutter视图绘制(1)写的是自带Skia的flutter如何“安排”绘制的步骤，接下来的(2),(3),(4),(5)，我想首先通过回顾和总结Android的视图绘制，再来反观flutter的实现，最后对比他们的异同。所以虽然这篇文章的题目是“Flutter视图绘制(2)”但是是”挂羊头卖狗肉”的，本文讲的是Android。 五个问题谁来">
+<meta name="twitter:image" content="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_normal.png?raw=true">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jinjian.info/2018/11/19/Flutter视图绘制-2/"/>
+
+
+
+
+
+  <title>Flutter 视图绘制(2) | Desire</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ddb5ad830b0accecaab2b551afd8c824";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Desire</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jinjian.info/2018/11/19/Flutter视图绘制-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jinjian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/my_logo.svg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Desire">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Flutter 视图绘制(2)</h1>
+        
+
+        <div class="post-meta">
+         
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-19T00:00:00+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android遇见Flutter/" itemprop="url" rel="index">
+                    <span itemprop="name">Android遇见Flutter</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+  
+
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,559字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Flutter视图绘制-2"><a href="#Flutter视图绘制-2" class="headerlink" title="Flutter视图绘制(2)"></a>Flutter视图绘制(2)</h1><p>[TOC]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>​    Flutter视图绘制(1)写的是自带Skia的flutter如何“安排”绘制的步骤，接下来的(2),(3),(4),(5)，我想首先通过回顾和总结Android的视图绘制，再来反观flutter的实现，最后对比他们的异同。所以虽然这篇文章的题目是“Flutter视图绘制(2)”但是是”挂羊头卖狗肉”的，本文讲的是Android。</p>
+<h2 id="五个问题"><a href="#五个问题" class="headerlink" title="五个问题"></a>五个问题</h2><h3 id="谁来发令？"><a href="#谁来发令？" class="headerlink" title="谁来发令？"></a>谁来发令？</h3><blockquote>
+<p>Android的手机屏幕有一个固定的刷新频率用于显示最新的画面，如60hz。而GPU生成一帧的图像也会有它自己的速率，那么如何做到它们的步调统一，不出乱子呢？</p>
+</blockquote>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_normal.png?raw=true" alt="vsync_normal"></p>
+<p>这是最终的解决方案。假如Display里的A，B，C是一个连续的动画，那么它将十分流畅的呈现出来。背后的设计就是”双缓存”+“VSYNC”。</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/two_buffer.png?raw=true" alt="two_buffer"></p>
+<ul>
+<li>双缓存：用于Display和用于Produce 各有一个Frame Buffer，各自工作，互不干扰。</li>
+<li>VSYNC：Display和Produce都受VSYNC信号控制。当发出信号后，交换两者的Frame Buffer，Display开始显示新帧，Produce开始生产下一帧。</li>
+</ul>
+<p>接下来我们用回退的方法把一个个条件去掉，来阐明为什么要这么设计。</p>
+<ol>
+<li><p>假如去掉双缓存的条件。</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_one_cache.png?raw=true" alt="two_buffer"></p>
+<p>观察第一个VSYNC后的Display显示，就有可能出现A+B(如下图)的情况</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/tearing.png?raw=true" alt="two_buffer"></p>
+</li>
+<li><p>假如去掉VSYNC的条件。</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_no_sync.png?raw=true" alt="two_buffer"></p>
+</li>
+</ol>
+<p>发现虽然B的生产只需要2ms，但还是出现了连续两个A(也就是卡顿)的现象，究其原因就是GPU闲置或者去忙别的事情去了，没有及时的生产B Buffer。</p>
+<ol>
+<li>假如Produce超过了16ms的生产周期</li>
+</ol>
+<p>​    <img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/vsync_bad.png?raw=true" alt="two_buffer"></p>
+<p>那么这就要开发者优化自己的代码了。</p>
+<h3 id="怎么转换？"><a href="#怎么转换？" class="headerlink" title="怎么转换？"></a>怎么转换？</h3><blockquote>
+<p>我们编写的xml布局文件是如何转换成屏幕上一个个的像素点的呢？</p>
+</blockquote>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/create.png?raw=true" alt="two_buffer"></p>
+<p>CPU: 屏幕上的view通过measure测量出宽高，通过layout计算出左上角位置，通过draw生成DisplayList（指令优化），通过将图像转化成多边形和纹理，上传至GPU。</p>
+<p>GPU：将图像栅格化也就是一个个的像素点。</p>
+<h3 id="谁站C位"><a href="#谁站C位" class="headerlink" title="谁站C位?"></a>谁站C位?</h3><blockquote>
+<p>假如要画一张Android视图绘制全景图，那在这幅图的中心位置应该是什么？</p>
+</blockquote>
+<p><strong>SurfaceFlinger</strong></p>
+<ol>
+<li><p>它是合成者</p>
+<p>通过一个dumpsys SurfaceFlinger命令。</p>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/dump.png?raw=true" alt="dump"></p>
+<p>可以清楚的看到有几个layer(对应的是应用层的一个window),它们所在的屏幕坐标，以及层级关系等等。</p>
+</li>
+<li><p>它是消费者</p>
+<p>取走了由应用层Surface生产的Grapic Buffer。</p>
+</li>
+<li><p>它是转化者</p>
+<p>由于屏幕的显示必须是硬件的Frame Buffer数据，所以surfaceFlinger在取出应用层的Grapic Buffer 后，首先将它合成到自己的Grapic Buffer 中，然后（FramebufferSurface）渲染到硬件的Fram Buffer中。</p>
+</li>
+</ol>
+<h3 id="如何协作？"><a href="#如何协作？" class="headerlink" title="如何协作？"></a>如何协作？</h3><blockquote>
+<p>在整个视图绘制系统中至少有两处用到了生产-消费者模型，所以理解它可以更好的帮助我们理解系统的运作。</p>
+</blockquote>
+<p><img src="https://github.com/jinjiankla/res/blob/master/jinjinkla/res/flutter4/model.png?raw=true" alt="model"></p>
+<p>但凡surface内部都有一个BufferQueue，应用层生产GrapicBuffer，SurfaceFlinger消费GrapicBuffer，这样就构成了一个基本的模型。其中每个Buffer有四种状态：</p>
+<p>1.Free:队列0状态（可以被生产者使用）</p>
+<p>2.Dequeued:生产中</p>
+<p>3.Queued:队列1状态（GraphicBuffer生产完成，等待被消费）</p>
+<p>4.Acquired:消费中</p>
+<p>Buffer的一次流动过程大致是一个逆时针的环：</p>
+<p>1.队列0状态到生产中</p>
+<p>2.生产完成到队列1状态</p>
+<p>3.队列1状态到消费中</p>
+<p>4.消费完成回到0状态</p>
+<h3 id="画布哪来？"><a href="#画布哪来？" class="headerlink" title="画布哪来？"></a>画布哪来？</h3><blockquote>
+<p>假如你写过自定义View，都会用到onDraw里面的Canvas这个画笔，那么这个画笔是画在哪个画布上呢？</p>
+</blockquote>
+<ol>
+<li><p>我们知道ViewRootImpl是所有View的Parent,所以先从ViewRootImpl的draw方法找起</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(<span class="keyword">boolean</span> fullRedrawNeeded)</span> </span>&#123;</span><br><span class="line">       Surface surface = mSurface;</span><br><span class="line">         <span class="comment">//......</span></span><br><span class="line">   </span><br><span class="line">               <span class="keyword">if</span> (!drawSoftware(surface, mAttachInfo, xOffset, yOffset, scalingRequired, dirty)) &#123;</span><br><span class="line">                   <span class="keyword">return</span>;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line"><span class="comment">//......</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>然后查看drawSoftware代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">drawSoftware</span><span class="params">(Surface surface, AttachInfo attachInfo, <span class="keyword">int</span> xoff, <span class="keyword">int</span> yoff,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="keyword">boolean</span> scalingRequired, Rect dirty)</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">       <span class="comment">// Draw with software renderer.</span></span><br><span class="line">       <span class="keyword">final</span> Canvas canvas;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="comment">//.....</span></span><br><span class="line">   </span><br><span class="line">           canvas = mSurface.lockCanvas(dirty);</span><br><span class="line">   </span><br><span class="line">       <span class="comment">//.....</span></span><br><span class="line">           <span class="keyword">try</span> &#123;</span><br><span class="line">               canvas.translate(-xoff, -yoff);</span><br><span class="line">               <span class="keyword">if</span> (mTranslator != <span class="keyword">null</span>) &#123;</span><br><span class="line">                   mTranslator.translateCanvas(canvas);</span><br><span class="line">               &#125;</span><br><span class="line">               canvas.setScreenDensity(scalingRequired ? mNoncompatDensity : <span class="number">0</span>);</span><br><span class="line">               attachInfo.mSetIgnoreDirtyState = <span class="keyword">false</span>;</span><br><span class="line">   </span><br><span class="line">               mView.draw(canvas);</span><br><span class="line">   </span><br><span class="line">               drawAccessibilityFocusedDrawableIfNeeded(canvas);</span><br><span class="line">           &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">               <span class="keyword">if</span> (!attachInfo.mSetIgnoreDirtyState) &#123;</span><br><span class="line">                   <span class="comment">// Only clear the flag if it was not set during the mView.draw() call</span></span><br><span class="line">                   attachInfo.mIgnoreDirtyState = <span class="keyword">false</span>;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; </span><br><span class="line">    <span class="comment">//.....</span></span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>发现这里ViewRootImpl里的全局变量 mSurface就是我们要找的。解决了来源，然后来解决唯一性的问题,否则一个界面上的View就会被画到不同的画布上了。</p>
+<ol>
+<li><p>我们以Activity举例，知道ActivityThread在handleResumeActivity的时候会去做UI显示，所以从这里入手开始</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">handleResumeActivity</span><span class="params">(IBinder token,</span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="keyword">boolean</span> clearHide, <span class="keyword">boolean</span> isForward, <span class="keyword">boolean</span> reallyResume, <span class="keyword">int</span> seq, String reason)</span> </span>&#123;</span><br><span class="line">       r = performResumeActivity(token, clearHide, reason);</span><br><span class="line">      </span><br><span class="line">       <span class="keyword">if</span> (r != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="comment">//......</span></span><br><span class="line">               <span class="keyword">if</span> (a.mVisibleFromClient) &#123;</span><br><span class="line">                   <span class="keyword">if</span> (!a.mWindowAdded) &#123;</span><br><span class="line">                       a.mWindowAdded = <span class="keyword">true</span>;</span><br><span class="line">                       wm.addView(decor, l);</span><br><span class="line">                   &#125; </span><br><span class="line">       <span class="comment">//........</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>我们找到了wm.addView操作，这里的wm其实是一个WindowManagerImpl的实例，所以接着往下看</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addView</span><span class="params">(@NonNull View view, @NonNull ViewGroup.LayoutParams params)</span> </span>&#123;</span><br><span class="line">    applyDefaultToken(params);</span><br><span class="line">    mGlobal.addView(view, params, mContext.getDisplay(), mParentWindow);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>发现实现类其实是WindowManagerGlobal的addView</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addView</span><span class="params">(View view, ViewGroup.LayoutParams params,</span></span></span><br><span class="line"><span class="function"><span class="params">           Display display, Window parentWindow)</span> </span>&#123;</span><br><span class="line">     <span class="comment">//....</span></span><br><span class="line">      </span><br><span class="line">           root = <span class="keyword">new</span> ViewRootImpl(view.getContext(), display);</span><br><span class="line">      </span><br><span class="line">           view.setLayoutParams(wparams);</span><br><span class="line">      </span><br><span class="line">           mViews.add(view);</span><br><span class="line">           mRoots.add(root);</span><br><span class="line">           mParams.add(wparams);</span><br><span class="line">      </span><br><span class="line">           <span class="comment">// do this last because it fires off messages to start doing things</span></span><br><span class="line">           <span class="keyword">try</span> &#123;</span><br><span class="line">               root.setView(view, wparams, panelParentView);</span><br><span class="line">           &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">               <span class="comment">// BadTokenException or InvalidDisplayException, clean up.</span></span><br><span class="line">               <span class="keyword">if</span> (index &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                   removeViewLocked(index, <span class="keyword">true</span>);</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="keyword">throw</span> e;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>通过ViewRootImpl的构造函数，我们确定了它存有WMS端的seesion代理对象，这样就可以去做真正的视图添加了。</p>
+<p>通过root.setView方法，我们确定了ViewRootImpl和DecorView的一一对应关系，保证了Activity上的所有view都画在一块画布上。</p>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h2><p>本想在最后举一个TextView的例子，但利用Google搜索发现两篇非常详尽的文章，就不费那力了，双手奉上。</p>
+<ol>
+<li><p>我们的Button是如何一步一步变成FrameBuffer数据的？</p>
+<p><a href="https://www.inovex.de/blog/android-graphics-pipeline-from-button-to-framebuffer-part-1/" target="_blank" rel="noopener">https://www.inovex.de/blog/android-graphics-pipeline-from-button-to-framebuffer-part-1/</a></p>
+</li>
+<li><p>RecylceView的一个Item被点击之后，视图绘制做了哪些事儿？</p>
+<p><a href="https://www.youtube.com/watch?v=zdQRIYOST64" target="_blank" rel="noopener">https://www.youtube.com/watch?v=zdQRIYOST64</a></p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Jinjian
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jinjian.info/2018/11/19/Flutter视图绘制-2/" title="Flutter 视图绘制(2)">http://jinjian.info/2018/11/19/Flutter视图绘制-2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Flutter/" rel="tag"># Flutter</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/04/Flutter 视图绘制/" rel="next" title="Flutter 视图绘制">
+                <i class="fa fa-chevron-left"></i> Flutter 视图绘制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/17/Flutter Live 2018之神器初体验/" rel="prev" title="Flutter Live 2018之神器初体验(番外篇)">
+                Flutter Live 2018之神器初体验(番外篇) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/my_logo.svg"
+                alt="Jinjian" />
+            
+              <p class="site-author-name" itemprop="name">Jinjian</p>
+              <p class="site-description motion-element" itemprop="description">Practice Makes Perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/jinjiankla" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinjiankla0203@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/users/8689674/user8689674" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Flutter视图绘制-2"><span class="nav-number">1.</span> <span class="nav-text">Flutter视图绘制(2)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五个问题"><span class="nav-number">1.2.</span> <span class="nav-text">五个问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#谁来发令？"><span class="nav-number">1.2.1.</span> <span class="nav-text">谁来发令？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么转换？"><span class="nav-number">1.2.2.</span> <span class="nav-text">怎么转换？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#谁站C位"><span class="nav-number">1.2.3.</span> <span class="nav-text">谁站C位?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何协作？"><span class="nav-number">1.2.4.</span> <span class="nav-text">如何协作？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#画布哪来？"><span class="nav-number">1.2.5.</span> <span class="nav-text">画布哪来？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#举例"><span class="nav-number">1.3.</span> <span class="nav-text">举例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jinjian</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
